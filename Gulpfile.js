@@ -29,7 +29,7 @@ var paths = {
     dest_css: './public/stylesheets',
     dest_js: './public/javascripts',
     dest_image: './public/images',
-
+ 
 };
 
 

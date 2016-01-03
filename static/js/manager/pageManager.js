@@ -1,6 +1,7 @@
 var $ = require('zepto'); 
 var pageContainer = require('view/viewContainer');
 
+var menus = require('plugin/menus');
 
 var ModuleManager = function () {
 	
@@ -36,7 +37,14 @@ ModuleManager.prototype.init = function (ele, module,flag) {
 	})
 	
 }
-
+/**
+ * [closeLoading 关闭loading页面]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:13:03+0800
+ * @param    {[type]}                 flag     [description]
+ * @param    {Function}               callback [description]
+ * @return   {[type]}                          [description]
+ */
 ModuleManager.prototype.closeLoading = function (flag,callback) {
 	var $loading = this.ele.find('#loading')
 	setTimeout(function () {
@@ -57,9 +65,15 @@ ModuleManager.prototype.closeLoading = function (flag,callback) {
 	
 }
 
-/*
-*构建页面
-*/
+/**
+ * [buildPage 构造页面]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:13:26+0800
+ * @param    {[type]}                 page     [description]
+ * @param    {Function}               callback [description]
+ * @param    {[type]}                 config   [description]
+ * @return   {[type]}                          [description]
+ */
 ModuleManager.prototype.buildPage = function (page, callback, config) {
 	var pageList = pageContainer.get(page), tpl, $page;
 	
@@ -76,9 +90,13 @@ ModuleManager.prototype.buildPage = function (page, callback, config) {
 }
 
 
-/*
-*获取页面
-*/
+/**
+ * [getView 获取页面jq节点]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:13:38+0800
+ * @param    {[type]}                 page [description]
+ * @return   {[type]}                      [description]
+ */
 ModuleManager.prototype.getView = function (page) {
 	return {
 		header: $('#'+page+'-head'),
@@ -86,7 +104,13 @@ ModuleManager.prototype.getView = function (page) {
 	}
 }
 
-/*展示页面*/
+/**
+ * [show 触发页面show event]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:14:08+0800
+ * @param    {[type]}                 _page [description]
+ * @return   {[type]}                       [description]
+ */
 ModuleManager.prototype.show = function (_page) { 
 	var page = _page || this.current,view = this.getView(page)
 		,$header = view.header, $content = view.content
@@ -97,7 +121,14 @@ ModuleManager.prototype.show = function (_page) {
 	
 	
 }
-
+/**
+ * [next 右侧切入]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:14:43+0800
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {Function}                      [description]
+ */
 ModuleManager.prototype.next = function (target,config) {
 	if(target === this.current || !pageContainer.get(target)) return; 
 	if(this.checkClick()) return; 
@@ -169,7 +200,14 @@ ModuleManager.prototype.next = function (target,config) {
 		
 	}, 50)
 }
-
+/**
+ * [prev 右侧切出]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:15:15+0800
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
 ModuleManager.prototype.prev = function (target, config) { 
 	
 	if(target === this.current || !pageContainer.get(target)) return; 
@@ -240,7 +278,12 @@ ModuleManager.prototype.prev = function (target, config) {
 		
 	}, 50)
 }
-
+/**
+ * [checkClick 检测是否还在动画中]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:15:33+0800
+ * @return   {[type]}                 [description]
+ */
 ModuleManager.prototype.checkClick = function () {
 	if(this.flag) return true;
 	else{
@@ -248,7 +291,11 @@ ModuleManager.prototype.checkClick = function () {
 		return false;
 	}
 }
-
+/**
+ * [setTimeout 触发hide时间并最后整理]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:15:48+0800
+ */
 ModuleManager.prototype.setTimeout = function () {
 	var me = this
 		,lastView = this.getView(this.lastCurrent)
@@ -297,6 +344,15 @@ ModuleManager.prototype.setTimeout = function () {
 	
 }
 
+/**
+ * [showErr 打开弹窗]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:16:19+0800
+ * @param    {[type]}                 msg       [description]
+ * @param    {[type]}                 submitFn  [description]
+ * @param    {Boolean}                isConfirm [description]
+ * @return   {[type]}                           [description]
+ */
 ModuleManager.prototype.showErr = function (msg,submitFn, isConfirm ) { 
 	var view = this.getView(this.current), me = this;
 	var data = {msg: msg, submitFn: submitFn, isConfirm: !!isConfirm};
@@ -312,7 +368,12 @@ ModuleManager.prototype.showErr = function (msg,submitFn, isConfirm ) {
 		me.show('error');
 	}, data) 
 }
-
+/**
+ * [hideErr 关闭弹窗]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:16:31+0800
+ * @return   {[type]}                 [description]
+ */
 ModuleManager.prototype.hideErr = function () {
 	var view = this.getView(this.current), me = this;
 	this.ele.find('.blur').removeClass('blur');
@@ -325,10 +386,42 @@ ModuleManager.prototype.hideErr = function () {
 	
 } 
 
+/**
+ * [buildMenu 创建个人菜单]
+ * yansanmu 
+ * @DateTime 2016-01-01T19:20:35+0800
+ * @param    {[type]}                 data [description]
+ * @return   {[type]}                      [description]
+ */
+ModuleManager.prototype.buildMenu = function(data) {
+	// body...
+	menus.buildMenu(data);
+};
+
+ModuleManager.prototype.showMenu = function () {
+	if(this.checkClick()) return; 
+	var me = this;
+	menus.showMenu(function() {
+		me.flag = false;
+	});
+}
+
+ModuleManager.prototype.hideMenu = function () {
+	if(this.checkClick()) return;
+	var me = this;
+	menus.hideMenu(function () {
+		me.flag = false;
+	});
+}
+
 var moduleManager = new ModuleManager();
  
  $(document).on('click','[data-toggle=errorSub]', function () {
 	moduleManager.hideErr();
+ }).on('click','[data-toggle="showMenu"]',function(){
+ 	moduleManager.showMenu();
+ }).on('click','[data-toggle="hideMenu"]',function(){
+ 	moduleManager.hideMenu();
  });
  
 module.exports = moduleManager;

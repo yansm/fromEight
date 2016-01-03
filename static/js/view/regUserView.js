@@ -3,8 +3,8 @@ var $ = require('zepto');
 var userComponent = require('component/userComponent');
 
 var tpl = 
-	'<header class="regstu-head" id="reguser-head"><div class="left-icon back-icon" data-toggle="prev" data-target="regstu"></header>'
-		+'<section class="regstu-area" id="reguser-area">'
+	'<header class="reguser-head" id="reguser-head"><div class="left-icon back-icon" data-toggle="prev" data-target="regstu"></header>'
+		+'<section class="reguser-area" id="reguser-area">'
 			+'<div class="container">'
 				+'<div rolr="form" id="regUser" class="form" >'
 					+'<div class="head-logo head-logo-stunum">请查看信息是否正确</div>'

@@ -1,7 +1,7 @@
 var $ = require('zepto');
 var attachFastClick = require('fastclick');
 var pageManager = require('manager/pageManager');
-var menusManager = require('plugin/menus');
+
 var sha1 = require('tool/sha1');
 var cookie = require('plugin/jquery.cookie');
 var localStorageManager = require('plugin/localStorageManager');
@@ -26,12 +26,16 @@ $(function () {
 	userStore.getUserInfo(function(res){
 		if(!res.code){
 			if(res.data && res.data.length){
+				//alert(JSON.stringify(res.data)); 
 				pageManager.init($('body'),module);
+				pageManager.buildMenu(res.data[0]);
 			}else{
 				pageManager.init($('body'), 'regstu');
-			}
+			} 
 		}else{
-			pageManager.init($('body'),'regstu');
+
+			pageManager.init($('body'),'main'); 
+			pageManager.buildMenu({nickName:'三木',userName:'闫三木',stuNum:'20093514',userHead: '../images/welcome1.jpg'});
 		}
 	});
 	

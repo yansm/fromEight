@@ -24,6 +24,13 @@ var storeManager = {
 			callback:callback,
 			data:data
 		});
+	},
+	list: function (data, callback) {
+		ajax({
+			url: '/user/list',
+			callback: callback,
+			data: data
+		})
 	}
 } 
 

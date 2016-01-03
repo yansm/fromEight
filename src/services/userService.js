@@ -32,6 +32,17 @@ module.exports = {
 	 */
 	checkUser: function (bean, callback) {
 		userDao.checkUser(bean, callback);
+	},
+	/**
+	 * [list description]
+	 * yansanmu 
+	 * @DateTime 2016-01-04T00:26:18+0800
+	 * @param    {[type]}                 bean     [description]
+	 * @param    {Function}               callback [description]
+	 * @return   {[type]}                          [description]
+	 */
+	list: function (bean, callback) {
+		userDao.list(bean, callback);
 	}
 
 }

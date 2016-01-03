@@ -20,11 +20,11 @@ module.exports = {
 	add: function(bean, callback){
 		var res = objectAssign({}, errcodeConfig[0]);
 		pool.getConnection(function(err, connection) {
-			var sql = 'INSERT INTO c8_user(open_id, user_name, nick_name, stu_number) VALUES(?,?,?,?)'
-				,data = [bean.openId, bean.userName, bean.nickName, bean.stuNum];
+			var sql = 'INSERT INTO c8_user(open_id, user_name, nick_name, stu_number, user_head, create_time) VALUES(?,?,?,?,?,?)'
+				,data = [bean.openId, bean.userName, bean.nickName, bean.stuNum, bean.userHead, bean.createTime];
 	  		connection.query(sql, data, function(err, result) {
 	        	if(!result) res = objectAssign({}, errcodeConfig[1001]);
-	        	callback&& callback(objectAssign({},res,{data:result})); 
+	        	callback&& callback(objectAssign({},res,{data:bean})); 
 		        // 释放连接 
 		        connection.release();
 	    	});
@@ -40,9 +40,9 @@ module.exports = {
 	queryByOpenId: function(bean, callback){
 		var res = objectAssign({}, errcodeConfig[0]);
 		pool.getConnection(function(err, connection) {
-			var sql = 'select * from c8_user where open_id=?';
+			var sql = 'select nick_name as nickName,user_head as userHead, user_name as userName,stu_number as stuNum from c8_user where open_id=?';
 	  		connection.query(sql, bean.openId, function(err, result) {
-	        	if(!result) res = objectAssign(res,{data: null});
+	        	if(!result || !result.length) res = objectAssign(res,{data: null});
 	        	else res = objectAssign(res,{data:result});
 	        	callback&& callback(res); 
 		        // 释放连接 
@@ -61,8 +61,30 @@ module.exports = {
 		var res = objectAssign({}, errcodeConfig[0]);
 		pool.getConnection(function(err, connection) {
 			var sql = 'select * from c8_user where stu_number=?';
-	  		connection.query(sql, bean.stu_number, function(err, result) {
-	        	if(!result) res = objectAssign(res,{data: null});
+	  		connection.query(sql, bean.stuNum, function(err, result) {
+	        	if(!result || !result.length) res = objectAssign(res,{data: null});
+	        	else res = objectAssign(res,{data:result});
+	        	callback&& callback(res); 
+		        // 释放连接 
+		        connection.release();
+	    	});
+	    });
+	},
+	/**
+	 * [list 用户列表]
+	 * yansanmu 
+	 * @DateTime 2016-01-03T23:33:37+0800
+	 * @param    {[object]}                 bean     [description]
+	 * @param    {Function}               callback [description]
+	 */
+	list: function(bean,callback){
+		var res = objectAssign({}, errcodeConfig[0]);
+		pool.getConnection(function(err, connection) {
+			var start = bean.startNum, end = bean.endNum;
+			var sql = 'select nick_name as nickName,user_head as userHead, user_name as userName,stu_number as stuNum'
+				+' from c8_user  order by create_time desc ' + (start&&end? (' limit '+ start +','+ end +' '): '');
+	  		connection.query(sql, function(err, result) {
+	        	if(!result || !result.length) res = objectAssign(res,{data: null});
 	        	else res = objectAssign(res,{data:result});
 	        	callback&& callback(res); 
 		        // 释放连接 

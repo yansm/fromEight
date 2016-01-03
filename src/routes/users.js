@@ -58,10 +58,27 @@ router.post('/check',function(req, res, next){
 router.post('/add',function(req, res, next){
 	var data = req.body;
 	var openId = req.cookies['open_id'];
-	data = objectAssign({}, data, {openId: openId});
+	var userHead = req.cookies['user_head']; 
+	var createTime = new Date().getTime();
+	data = objectAssign({}, data, {openId: openId, userHead: userHead, createTime: createTime});
 	userService.add(data,function (uRes) {
 		res.json(uRes);
 	});
+});
+/**
+ * [用户列表]
+ * yansanmu 
+ * @DateTime 2016-01-04T00:27:25+0800
+ * @param    {[type]}                 req       [description]
+ * @param    {[type]}                 res       [description]
+ * @param    {[type]}                 next){} [description]
+ * @return   {[type]}                           [description]
+ */
+router.post('/list', function(req, res, next){
+	var data = req.body;
+	userService.list(data, function (uRes){
+		res.json(uRes);
+	})
 });
 
 module.exports = router;
