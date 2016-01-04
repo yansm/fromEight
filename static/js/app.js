@@ -50,6 +50,14 @@ $(function () {
 			var $this = $(this), target = $this.data('target'); 
 			pageManager.prev(target);
 		})
+		.on('click','[data-toggle="fadeout"]', function (e) { 
+			var $this = $(this), target = $this.data('target'); 
+			pageManager.fadeout(target);
+		})
+		.on('click','[data-toggle="fadein"]', function (e) { 
+			var $this = $(this), target = $this.data('target'); 
+			pageManager.fadein(target);
+		})
 	
 
 }); 

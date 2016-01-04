@@ -894,41 +894,18 @@ $(function () {
 			var $this = $(this), target = $this.data('target'); 
 			pageManager.prev(target);
 		})
+		.on('click','[data-toggle="fadeout"]', function (e) { 
+			var $this = $(this), target = $this.data('target'); 
+			pageManager.fadeout(target);
+		})
+		.on('click','[data-toggle="fadein"]', function (e) { 
+			var $this = $(this), target = $this.data('target'); 
+			pageManager.fadein(target);
+		})
 	
 
 }); 
-},{"fastclick":1,"manager/pageManager":6,"plugin/form":7,"plugin/jquery.cookie":8,"plugin/localStorageManager":9,"store/userStore":13,"tool/ajax":14,"tool/getUrlVar":15,"tool/sha1":16,"zepto":30}],3:[function(require,module,exports){
-var $ = require('zepto');
-var $ = require('zepto');
-var essayStore = require('store/essayStore');
-var ajax = require('tool/ajax');
-
-
-
-var storeComponent = {
-	buildEssay: function($view,data){
-		var title = data.title, time = data.time, author = data.author, url = data.url;
-		$view.find('.head-title').html(title);
-		console.log(url);
-		essayStore.getEssay(url, function(data){ 
-			var html = [];
-			html.push('<div class="essay-head"><h2>'+ title +'</h2><aside>by '+ author +' '+ time +'</aside></div>');	
-			html.push('<div class="essay-content">')
-			for(var i = 0, length = data.length; i< length; i ++){
-				html.push('<p>'+data[i]+'</p>')
-			}
-			html.push('</div>')
-			$view.find('.article-box').html(html.join(''))
-		});
-		
-		
-		
-		
-	}
-}
-
-module.exports = storeComponent; 
-},{"store/essayStore":11,"tool/ajax":14,"zepto":30}],4:[function(require,module,exports){
+},{"fastclick":1,"manager/pageManager":5,"plugin/form":6,"plugin/jquery.cookie":7,"plugin/localStorageManager":8,"store/userStore":11,"tool/ajax":12,"tool/getUrlVar":13,"tool/sha1":14,"zepto":21}],3:[function(require,module,exports){
 var $ = require('zepto');
 var listStore = require('store/listStore');
 
@@ -986,7 +963,7 @@ var storeComponent = {
 }
 
 module.exports = storeComponent; 
-},{"store/listStore":12,"zepto":30}],5:[function(require,module,exports){
+},{"store/listStore":10,"zepto":21}],4:[function(require,module,exports){
 var $ = require('zepto');
 var $ = require('zepto');
 var userStore = require('store/userStore');
@@ -1064,7 +1041,7 @@ var storeComponent = {
 }
 
 module.exports = storeComponent; 
-},{"store/userStore":13,"tool/ajax":14,"zepto":30}],6:[function(require,module,exports){
+},{"store/userStore":11,"tool/ajax":12,"zepto":21}],5:[function(require,module,exports){
 var $ = require('zepto'); 
 var pageContainer = require('view/viewContainer');
 
@@ -1189,14 +1166,59 @@ ModuleManager.prototype.show = function (_page) {
 	
 }
 /**
- * [next 右侧切入]
- * yansanmu 
- * @DateTime 2016-01-01T19:14:43+0800
+ * [next 右侧切出]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:32:59+0800
  * @param    {[type]}                 target [description]
  * @param    {[type]}                 config [description]
  * @return   {Function}                      [description]
  */
-ModuleManager.prototype.next = function (target,config) {
+ModuleManager.prototype.next = function (target, config){
+	this.animate('next',target, config);
+}
+/**
+ * [prev 右侧切入]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:34:10+0800
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
+ModuleManager.prototype.prev = function (target, config){
+	this.animate('prev', target, config);
+}
+/**
+ * [fadeout 淡出]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:42:05+0800
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
+ModuleManager.prototype.fadeout = function (target, config){
+	this.animate('fadeout', target, config);
+}
+/**
+ * [fadein 淡入]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:42:32+0800
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
+ModuleManager.prototype.fadein = function (target, config){
+	this.animate('fadein', target, config);
+}
+/**
+ * [animate 动画效果]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:31:03+0800
+ * @param    {[type]}                 type   [description]
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
+ModuleManager.prototype.animate = function (type,target, config) {
 	if(target === this.current || !pageContainer.get(target)) return; 
 	if(this.checkClick()) return; 
 	this.lastCurrent = this.current;
@@ -1208,6 +1230,20 @@ ModuleManager.prototype.next = function (target,config) {
 		if(me.showFlag) me.show(target);
 		else me.showFlag = true;
 	}, config);	
+
+	me['_'+type] && me['_'+type](function(){
+		me.setTimeout();
+	})
+
+}
+/**
+ * [_next 右侧切入 内部类]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:38:36+0800
+ * @param    {Function}               callback [description]
+ * @return   {[type]}                          [description]
+ */
+ModuleManager.prototype._next = function (callback) {
 	
 	var lastView = this.getView(this.lastCurrent)
 		,view = this.getView(this.current) 
@@ -1263,32 +1299,17 @@ ModuleManager.prototype.next = function (target,config) {
 			'transform':'translate(0,0)'
 		});
 		
-		me.setTimeout();
+		callback && callback();
 		
 	}, 50)
 }
 /**
- * [prev 右侧切出]
- * yansanmu 
- * @DateTime 2016-01-01T19:15:15+0800
- * @param    {[type]}                 target [description]
- * @param    {[type]}                 config [description]
- * @return   {[type]}                        [description]
+ * [_prev 右侧切出 内部类]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:38:21+0800
+ * @param    {Function}               callback [description]
  */
-ModuleManager.prototype.prev = function (target, config) { 
-	
-	if(target === this.current || !pageContainer.get(target)) return; 
-	if(this.checkClick()) return; 
-	this.lastCurrent = this.current;
-	this.current = target;
-	this.showFlag = false;
-		
-	var me = this;
-	me.buildPage(me.current, function () {
-		if(me.showFlag) me.show();
-		else me.showFlag = true;
-	}, config);	
-	
+ModuleManager.prototype._prev = function (callback) { 
 	var lastView = this.getView(this.lastCurrent)
 		,view = this.getView(this.current) 
 		,$lastHeader = lastView.header, $lastContent = lastView.content
@@ -1341,7 +1362,128 @@ ModuleManager.prototype.prev = function (target, config) {
 			'transform':'translate(0,0)'
 		});
 		 
-		me.setTimeout();
+		callback && callback();
+		
+	}, 50)
+}
+/**
+ * [_fadeout 淡出 内部类]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:53:33+0800
+ * @param    {Function}               callback [description]
+ * @return   {[type]}                          [description]
+ */
+ModuleManager.prototype._fadeout = function (callback) {
+	var lastView = this.getView(this.lastCurrent)
+		,view = this.getView(this.current) 
+		,$lastHeader = lastView.header, $lastContent = lastView.content
+		,$header = view.header, $content = view.content
+		,$body = $('body');
+
+	$lastHeader.css({
+		'z-index': '9'
+	});
+	$lastContent.css({
+		'position': 'absolute',
+		'top': '0',
+		'left': '0',
+		'z-index': '8',
+		'-webkit-transform':'scale(1)',
+		'transform':'scale(1)',
+	}).find('.container').css({
+		'-webkit-transform':'scale(1)',
+		'transform':'scale(1)',
+	});
+	$header.css({
+		
+		'z-index': '2',
+		'display':'block'
+	});
+	$content.css({
+		'position': 'fixed',
+		'top': '0', 
+		'left': '0',
+		'z-index': '1',
+		'display':'table'
+	})
+	
+	$body.css('overflow', 'hidden');
+
+	setTimeout(function(){
+		$lastHeader.css({
+			'-webkit-transform':'scale(2)',
+			'transform':'scale(2)',
+			'opacity': '0'
+		});
+		$lastContent.find('.container').css({
+			'-webkit-transform':'scale(2)',
+			'transform':'scale(2)',
+			'opacity': '0'
+		});
+		
+		 
+		callback && callback();
+		
+	}, 50)
+}
+/**
+ * [_fadein 淡入 内部类]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T15:01:58+0800
+ * @param    {Function}               callback [description]
+ * @return   {[type]}                          [description]
+ */
+ModuleManager.prototype._fadein = function (callback) {
+	var lastView = this.getView(this.lastCurrent)
+		,view = this.getView(this.current) 
+		,$lastHeader = lastView.header, $lastContent = lastView.content
+		,$header = view.header, $content = view.content
+		,$body = $('body');
+
+	$lastHeader.css({
+		'z-index': '2'
+	});
+	$lastContent.css({
+		'position': 'absolute',
+		'top': '0',
+		'left': '0',
+		'z-index': '1',
+	});
+	$header.css({
+		'z-index': '9',
+		'display':'block',
+		'-webkit-transform':'scale(2)',
+		'transform':'scale(2)',
+		'opacity': '0'
+	});
+	$content.css({
+		'position': 'fixed',
+		'top': '0', 
+		'left': '0',
+		'z-index': '8',
+		'display':'table'
+	}).find('.container').css({
+		'-webkit-transform':'scale(2)',
+		'transform':'scale(2)',
+		'opacity': '0'
+	});
+	
+	$body.css('overflow', 'hidden');
+
+	setTimeout(function(){
+		$header.css({
+			'-webkit-transform':'scale(1)',
+			'transform':'scale(1)',
+			'opacity': '1'
+		});
+		$content.find('.container').css({
+			'-webkit-transform':'scale(1)',
+			'transform':'scale(1)',
+			'opacity': '1'
+		});
+		
+		 
+		callback && callback();
 		
 	}, 50)
 }
@@ -1376,10 +1518,15 @@ ModuleManager.prototype.setTimeout = function () {
 	me.timeout = setTimeout(function () {
 		setTimeout(function () {
 			 
-			$lastHeader.css({'display':'none'});
+			$lastHeader.css({'display':'none'}).css({
+				'-webkit-transform':'translate(0,0) scale(1)',
+				'transform':'translate(0,0) scale(1)',
+				'opacity': '1'
+			});
 			$lastContent.css({'display':'none'}).find('.container').css({
-				'-webkit-transform':'translate(0,0)',
-				'transform':'translate(0,0)'
+				'-webkit-transform':'translate(0,0) scale(1)',
+				'transform':'translate(0,0) scale(1)',
+				'opacity': '1'
 			});
 			//如果需要重载则删除节点
 			if(!!pageList.needReload){
@@ -1495,7 +1642,7 @@ module.exports = moduleManager;
 
 
 
-},{"plugin/menus":10,"view/viewContainer":26,"zepto":30}],7:[function(require,module,exports){
+},{"plugin/menus":9,"view/viewContainer":20,"zepto":21}],6:[function(require,module,exports){
 var $ = require('zepto');
 
 
@@ -1655,7 +1802,7 @@ var $ = require('zepto');
 	}
 	
 module.exports = null;
-},{"zepto":30}],8:[function(require,module,exports){
+},{"zepto":21}],7:[function(require,module,exports){
 
 
 /*!
@@ -1773,7 +1920,7 @@ module.exports = null;
 
 }));
 
-},{"zepto":30}],9:[function(require,module,exports){
+},{"zepto":21}],8:[function(require,module,exports){
 var flag = !!window.localStorage;
 
 module.exports = {
@@ -1787,7 +1934,7 @@ module.exports = {
 		flag && localStorage.removeItem(key);
 	}
 }; 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var $ = require('zepto');
 
 var $body = $('body');
@@ -1867,26 +2014,7 @@ var menusManager = {
  
 
 module.exports = menusManager;
-},{"zepto":30}],11:[function(require,module,exports){
-var $ = require('zepto');
-var ajax = require('tool/ajax');
-
-
-
-var Data = {};
-
-var storeManager = {
-	getEssay: function(url, callback){
-		ajax({
-			url: url,
-			type:'get',
-			callback:callback
-		})
-	}
-}
-
-module.exports = storeManager;
-},{"tool/ajax":14,"zepto":30}],12:[function(require,module,exports){
+},{"zepto":21}],10:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -1942,7 +2070,7 @@ var storeManager = {
 }
 
 module.exports = storeManager;
-},{"tool/ajax":14,"zepto":30}],13:[function(require,module,exports){
+},{"tool/ajax":12,"zepto":21}],11:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -1980,7 +2108,7 @@ var storeManager = {
 } 
 
 module.exports = storeManager;
-},{"tool/ajax":14,"zepto":30}],14:[function(require,module,exports){
+},{"tool/ajax":12,"zepto":21}],12:[function(require,module,exports){
 var $ = require('zepto');
 
 module.exports = function (config) {
@@ -1998,14 +2126,14 @@ module.exports = function (config) {
 		}
 	});
 }  
-},{"zepto":30}],15:[function(require,module,exports){
+},{"zepto":21}],13:[function(require,module,exports){
 
 module.exports = function (url,key) {
 	var reg = new RegExp('(\\?|\\&)'+ key +'=([^\\&]+)')
 	var value = url.match(reg); 
 	return value&&value.length? value[2] : null;
 }
-},{}],16:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -2215,65 +2343,7 @@ function binb2b64(binarray)
   return str;
 }
 
-},{}],17:[function(require,module,exports){
-var $ = require('zepto');
-var essayComponent = require('component/essayComponent');
-
-var tpl = 
-	'<header class="article-head" id="article1-head"><div class="left-icon back-icon" data-toggle="prev" data-target="list1"></div><span class="head-title ell" style="width:500px;"></span><div class="right-icon empty-icon"></div></header>'
-		+'<section class="article-area" id="article1-area">'
-			+'<div class="container">'
-				+'<div class="article-box"></div>'
-			+'</div>'
-		+'</section>'
-		
-var hiddenEvent;
-
-var showEvent;
-
-var buildPage = function($view, callback,config) {
-	var pageManager = this;
-	essayComponent.buildEssay($view,config);
-	callback && callback();
-} 
-
-module.exports = {
-	tpl: tpl,
-	hiddenEvent: hiddenEvent,
-	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true,
-} 
-},{"component/essayComponent":3,"zepto":30}],18:[function(require,module,exports){
-var $ = require('zepto');
-var essayComponent = require('component/essayComponent');
-
-var tpl = 
-	'<header class="article-head" id="article2-head"><div class="left-icon back-icon" data-toggle="prev" data-target="list2"></div><span class="head-title ell" style="width:500px;"></span><div class="right-icon empty-icon"></div></header>'
-		+'<section class="article-area" id="article2-area">'
-			+'<div class="container">'
-				+'<div class="article-box"></div>'
-			+'</div>'
-		+'</section>'
-		
-var hiddenEvent;
-
-var showEvent;
-
-var buildPage = function($view, callback,config) {
-	var pageManager = this;
-	essayComponent.buildEssay($view,config);
-	callback && callback();
-} 
-
-module.exports = {
-	tpl: tpl,
-	hiddenEvent: hiddenEvent,
-	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true,
-} 
-},{"component/essayComponent":3,"zepto":30}],19:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var $ = require('zepto');
 
 var tpl = 
@@ -2330,94 +2400,7 @@ module.exports = {
 	hideMenu: 'auto',
 	errorList: errorList
 } 	
-},{"zepto":30}],20:[function(require,module,exports){
-var $ = require('zepto');
-var listComponent = require('component/listComponent');
-
-var tpl = 
-	'<header class="list-head" id="list1-head"><div class="left-icon back-icon" data-toggle="prev" data-target="main"></div>原味斋<div class="right-icon empty-icon"></div></header>'
-		+'<section class="list-area" id="list1-area">'
-			+'<div class="container no-padding">'
-				+'<div class="list-list" id="list1"></div>'
-			+'</div>'
-		+'</section>'
-		
-var hiddenEvent;
-
-var showEvent;
-
-var buildPage = function($view, callback) {
-	var pageManager = this;
-	listComponent.buildList1($view.find('#list1'), pageManager);
-	callback && callback();
-} 
-
-module.exports = {
-	tpl: tpl,
-	hiddenEvent: hiddenEvent,
-	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true,
-} 
-},{"component/listComponent":4,"zepto":30}],21:[function(require,module,exports){
-var $ = require('zepto');
-var listComponent = require('component/listComponent');
-
-var tpl = 
-	'<header class="list-head" id="list2-head"><div class="left-icon back-icon" data-toggle="prev" data-target="main"></div>故事会<div class="right-icon empty-icon"></div></header>'
-		+'<section class="list-area" id="list2-area">'
-			+'<div class="container no-padding">'
-				+'<div class="list-list" id="list2"></div>'
-			+'</div>'
-		+'</section>'
-		
-var hiddenEvent;
-
-var showEvent;
-
-var buildPage = function($view, callback) {
-	var pageManager = this;
-	listComponent.buildList2($view.find('#list2'), pageManager);
-	callback && callback();
-} 
-
-module.exports = {
-	tpl: tpl,
-	hiddenEvent: hiddenEvent,
-	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true,
-} 
-},{"component/listComponent":4,"zepto":30}],22:[function(require,module,exports){
-var $ = require('zepto');
-var listComponent = require('component/listComponent');
-
-var tpl = 
-	'<header class="list-head" id="list3-head"><div class="left-icon back-icon" data-toggle="prev" data-target="main"></div>无码区<div class="right-icon empty-icon"></div></header>'
-		+'<section class="list-area" id="list3-area">'
-			+'<div class="container no-padding">'
-				+'<div class="list-list" id="list3"></div>'
-			+'</div>'
-		+'</section>'
-		
-var hiddenEvent;
-
-var showEvent;
-
-var buildPage = function($view, callback) {
-	var pageManager = this;
-	listComponent.buildList3($view.find('#list3'), pageManager);
-	callback && callback();
-} 
-
-module.exports = {
-	tpl: tpl,
-	hiddenEvent: hiddenEvent,
-	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true,
-} 
-},{"component/listComponent":4,"zepto":30}],23:[function(require,module,exports){
+},{"zepto":21}],16:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2427,13 +2410,13 @@ var tpl =
 		+'<section class="main-area" id="main-area">'
 			+'<div class="container no-padding">'
 				+'<div class="logo-area"></div>'
-				+'<div class="main-box main-box-1"></div>'
+				+'<div class="main-box main-box-1" ></div>'
 				+'<div class="main-aside">'
 					+'<p>终究过去再回不去</p>'
 					+'<p style="text-indent:1.5em;">但是至少还留有回忆</p>'
 					+'<p style="text-indent:3em;">每个人，每件事，都清清楚楚</p>'
 				+'</div>'
-				+'<div class="main-box main-box-2"></div>'
+				+'<div class="main-box main-box-2" data-toggle="fadeout" data-target="message"></div>'
 				+'<div class="main-aside">'
 					+'<p>过去的每一个故事</p>'
 					+'<p style="text-indent:1.5em;">与未来的每一份期待</p>'
@@ -2457,11 +2440,39 @@ module.exports = {
 	tpl: tpl,
 	hiddenEvent: hiddenEvent,
 	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true
+	buildPage: buildPage
 }
  
-},{"component/userComponent":5,"zepto":30}],24:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":21}],17:[function(require,module,exports){
+var $ = require('zepto');
+var listComponent = require('component/listComponent');
+
+var tpl = 
+	'<header class="message-head" id="message-head"><div class="left-icon back-icon" data-toggle="fadein" data-target="main"></div></header>'
+		+'<section class="message-area" id="message-area">'
+			+'<div class="container no-padding">'
+				
+			+'</div>'
+		+'</section>'
+		
+var hiddenEvent;
+
+var showEvent;
+
+var buildPage = function($view, callback) {
+	var pageManager = this;
+	//listComponent.buildList1($view.find('#list1'), pageManager);
+	callback && callback();
+} 
+
+module.exports = {
+	tpl: tpl,
+	hiddenEvent: hiddenEvent,
+	showEvent: showEvent, 
+	buildPage: buildPage,
+	needReload: true,
+} 
+},{"component/listComponent":3,"zepto":21}],18:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2497,7 +2508,7 @@ module.exports = {
 	needReload: true
 } 
  
-},{"component/userComponent":5,"zepto":30}],25:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":21}],19:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2542,7 +2553,7 @@ module.exports = {
 	needReload: true
 } 
  
-},{"component/userComponent":5,"zepto":30}],26:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":21}],20:[function(require,module,exports){
 var pages = {};
 
 pages.regstu = require('./regStuView');
@@ -2552,117 +2563,17 @@ pages.main = require('./mainView');
 
 pages.error = require('./errorView');
 
+pages.main = require('./mainView');
 
-pages.welcome1 = require('./welcome1View');
-pages.welcome2 = require('./welcome2View');
-pages.welcome3 = require('./welcome3View');
-
-pages.list1 = require('./list1View');
-pages.list2 = require('./list2View');
-pages.list3 = require('./list3View');
-pages.article1 = require('./article1View');
-pages.article2 = require('./article2View');
-
+pages.message = require('./messageView');
 
 
 module.exports = {
-	get: function (page) {
+	get: function (page) { 
 		return pages[page]|| null;
 	}
 } 
-},{"./article1View":17,"./article2View":18,"./errorView":19,"./list1View":20,"./list2View":21,"./list3View":22,"./mainView":23,"./regStuView":24,"./regUserView":25,"./welcome1View":27,"./welcome2View":28,"./welcome3View":29}],27:[function(require,module,exports){
-var $ = require('zepto');
-
-var tpl = 
-		'<section class="welcome1-area" id="welcome1-area">'
-			+'<div class="container no-padding">'
-				+'<div class="w1"></div>'
-				+'<div class="w2"></div>'
-				+'<div class="next" data-toggle="next" data-target="welcome2"></div>'
-			+'</div>'
-		+'</section>'
-		 
-var hiddenEvent;
-
-var showEvent;
-
-var buildPage = function ($view, callback) {
-	setTimeout(function() {
-		$view.find('.container').addClass('in');
-	},100)
-	callback && callback();
-};
-
-module.exports = {
-	tpl: tpl,
-	hiddenEvent: hiddenEvent,
-	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true
-}    
-},{"zepto":30}],28:[function(require,module,exports){
-var $ = require('zepto');
-
-var tpl = 
-		'<section class="welcome2-area" id="welcome2-area">'
-			+'<div class="container no-padding">'
-				+'<div class="w1"></div>'
-				+'<div class="w2"></div>'
-				+'<div class="next" data-toggle="next" data-target="welcome3"></div>'
-			+'</div>'
-		+'</section>'
-		 
-var hiddenEvent;
-
-var showEvent;
-
-var buildPage = function ($view, callback) {
-	setTimeout(function() {
-		$view.find('.container').addClass('in');
-	},100)
-	callback && callback();
-};
-
-module.exports = {
-	tpl: tpl,
-	hiddenEvent: hiddenEvent,
-	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true
-}    
-},{"zepto":30}],29:[function(require,module,exports){
-var $ = require('zepto');
-
-var tpl = 
-		'<section class="welcome3-area" id="welcome3-area">'
-			+'<div class="container no-padding">'
-				+'<div class="w1"></div>'
-				+'<div class="w2"></div>'
-				+'<div class="w3"></div>'
-				+'<div class="w4"></div>'
-				+'<div class="next open" data-toggle="next" data-target="main"></div>'
-			+'</div>'
-		+'</section>'
-		 
-var hiddenEvent;
-
-var showEvent;
-
-var buildPage = function ($view, callback) {
-	setTimeout(function() {
-		$view.find('.container').addClass('in');
-	},100)
-	callback && callback();
-};
-
-module.exports = {
-	tpl: tpl,
-	hiddenEvent: hiddenEvent,
-	showEvent: showEvent, 
-	buildPage: buildPage,
-	needReload: true
-}    
-},{"zepto":30}],30:[function(require,module,exports){
+},{"./errorView":15,"./mainView":16,"./messageView":17,"./regStuView":18,"./regUserView":19}],21:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/

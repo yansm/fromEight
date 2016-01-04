@@ -122,14 +122,59 @@ ModuleManager.prototype.show = function (_page) {
 	
 }
 /**
- * [next 右侧切入]
- * yansanmu 
- * @DateTime 2016-01-01T19:14:43+0800
+ * [next 右侧切出]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:32:59+0800
  * @param    {[type]}                 target [description]
  * @param    {[type]}                 config [description]
  * @return   {Function}                      [description]
  */
-ModuleManager.prototype.next = function (target,config) {
+ModuleManager.prototype.next = function (target, config){
+	this.animate('next',target, config);
+}
+/**
+ * [prev 右侧切入]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:34:10+0800
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
+ModuleManager.prototype.prev = function (target, config){
+	this.animate('prev', target, config);
+}
+/**
+ * [fadeout 淡出]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:42:05+0800
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
+ModuleManager.prototype.fadeout = function (target, config){
+	this.animate('fadeout', target, config);
+}
+/**
+ * [fadein 淡入]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:42:32+0800
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
+ModuleManager.prototype.fadein = function (target, config){
+	this.animate('fadein', target, config);
+}
+/**
+ * [animate 动画效果]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:31:03+0800
+ * @param    {[type]}                 type   [description]
+ * @param    {[type]}                 target [description]
+ * @param    {[type]}                 config [description]
+ * @return   {[type]}                        [description]
+ */
+ModuleManager.prototype.animate = function (type,target, config) {
 	if(target === this.current || !pageContainer.get(target)) return; 
 	if(this.checkClick()) return; 
 	this.lastCurrent = this.current;
@@ -141,6 +186,20 @@ ModuleManager.prototype.next = function (target,config) {
 		if(me.showFlag) me.show(target);
 		else me.showFlag = true;
 	}, config);	
+
+	me['_'+type] && me['_'+type](function(){
+		me.setTimeout();
+	})
+
+}
+/**
+ * [_next 右侧切入 内部类]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:38:36+0800
+ * @param    {Function}               callback [description]
+ * @return   {[type]}                          [description]
+ */
+ModuleManager.prototype._next = function (callback) {
 	
 	var lastView = this.getView(this.lastCurrent)
 		,view = this.getView(this.current) 
@@ -196,32 +255,17 @@ ModuleManager.prototype.next = function (target,config) {
 			'transform':'translate(0,0)'
 		});
 		
-		me.setTimeout();
+		callback && callback();
 		
 	}, 50)
 }
 /**
- * [prev 右侧切出]
- * yansanmu 
- * @DateTime 2016-01-01T19:15:15+0800
- * @param    {[type]}                 target [description]
- * @param    {[type]}                 config [description]
- * @return   {[type]}                        [description]
+ * [_prev 右侧切出 内部类]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:38:21+0800
+ * @param    {Function}               callback [description]
  */
-ModuleManager.prototype.prev = function (target, config) { 
-	
-	if(target === this.current || !pageContainer.get(target)) return; 
-	if(this.checkClick()) return; 
-	this.lastCurrent = this.current;
-	this.current = target;
-	this.showFlag = false;
-		
-	var me = this;
-	me.buildPage(me.current, function () {
-		if(me.showFlag) me.show();
-		else me.showFlag = true;
-	}, config);	
-	
+ModuleManager.prototype._prev = function (callback) { 
 	var lastView = this.getView(this.lastCurrent)
 		,view = this.getView(this.current) 
 		,$lastHeader = lastView.header, $lastContent = lastView.content
@@ -274,7 +318,128 @@ ModuleManager.prototype.prev = function (target, config) {
 			'transform':'translate(0,0)'
 		});
 		 
-		me.setTimeout();
+		callback && callback();
+		
+	}, 50)
+}
+/**
+ * [_fadeout 淡出 内部类]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T11:53:33+0800
+ * @param    {Function}               callback [description]
+ * @return   {[type]}                          [description]
+ */
+ModuleManager.prototype._fadeout = function (callback) {
+	var lastView = this.getView(this.lastCurrent)
+		,view = this.getView(this.current) 
+		,$lastHeader = lastView.header, $lastContent = lastView.content
+		,$header = view.header, $content = view.content
+		,$body = $('body');
+
+	$lastHeader.css({
+		'z-index': '9'
+	});
+	$lastContent.css({
+		'position': 'absolute',
+		'top': '0',
+		'left': '0',
+		'z-index': '8',
+		'-webkit-transform':'scale(1)',
+		'transform':'scale(1)',
+	}).find('.container').css({
+		'-webkit-transform':'scale(1)',
+		'transform':'scale(1)',
+	});
+	$header.css({
+		
+		'z-index': '2',
+		'display':'block'
+	});
+	$content.css({
+		'position': 'fixed',
+		'top': '0', 
+		'left': '0',
+		'z-index': '1',
+		'display':'table'
+	})
+	
+	$body.css('overflow', 'hidden');
+
+	setTimeout(function(){
+		$lastHeader.css({
+			'-webkit-transform':'scale(2)',
+			'transform':'scale(2)',
+			'opacity': '0'
+		});
+		$lastContent.find('.container').css({
+			'-webkit-transform':'scale(2)',
+			'transform':'scale(2)',
+			'opacity': '0'
+		});
+		
+		 
+		callback && callback();
+		
+	}, 50)
+}
+/**
+ * [_fadein 淡入 内部类]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-04T15:01:58+0800
+ * @param    {Function}               callback [description]
+ * @return   {[type]}                          [description]
+ */
+ModuleManager.prototype._fadein = function (callback) {
+	var lastView = this.getView(this.lastCurrent)
+		,view = this.getView(this.current) 
+		,$lastHeader = lastView.header, $lastContent = lastView.content
+		,$header = view.header, $content = view.content
+		,$body = $('body');
+
+	$lastHeader.css({
+		'z-index': '2'
+	});
+	$lastContent.css({
+		'position': 'absolute',
+		'top': '0',
+		'left': '0',
+		'z-index': '1',
+	});
+	$header.css({
+		'z-index': '9',
+		'display':'block',
+		'-webkit-transform':'scale(2)',
+		'transform':'scale(2)',
+		'opacity': '0'
+	});
+	$content.css({
+		'position': 'fixed',
+		'top': '0', 
+		'left': '0',
+		'z-index': '8',
+		'display':'table'
+	}).find('.container').css({
+		'-webkit-transform':'scale(2)',
+		'transform':'scale(2)',
+		'opacity': '0'
+	});
+	
+	$body.css('overflow', 'hidden');
+
+	setTimeout(function(){
+		$header.css({
+			'-webkit-transform':'scale(1)',
+			'transform':'scale(1)',
+			'opacity': '1'
+		});
+		$content.find('.container').css({
+			'-webkit-transform':'scale(1)',
+			'transform':'scale(1)',
+			'opacity': '1'
+		});
+		
+		 
+		callback && callback();
 		
 	}, 50)
 }
@@ -309,10 +474,15 @@ ModuleManager.prototype.setTimeout = function () {
 	me.timeout = setTimeout(function () {
 		setTimeout(function () {
 			 
-			$lastHeader.css({'display':'none'});
+			$lastHeader.css({'display':'none'}).css({
+				'-webkit-transform':'translate(0,0) scale(1)',
+				'transform':'translate(0,0) scale(1)',
+				'opacity': '1'
+			});
 			$lastContent.css({'display':'none'}).find('.container').css({
-				'-webkit-transform':'translate(0,0)',
-				'transform':'translate(0,0)'
+				'-webkit-transform':'translate(0,0) scale(1)',
+				'transform':'translate(0,0) scale(1)',
+				'opacity': '1'
 			});
 			//如果需要重载则删除节点
 			if(!!pageList.needReload){

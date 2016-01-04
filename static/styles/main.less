@@ -1,13 +1,6 @@
-@baseColor:#994eb8;
-@baseColor2: #2c3e50;
-@baseBg: #ecf0f1;
-@transTime: 430ms;
 
-*,*:before,*:after{box-sizing: border-box;}
-*{
-	-webkit-tap-highlight-color:transparent;
-	user-select:none;
-}
+
+
 html{
 	width:100%;height:100%; padding-top:1px;background:#fff;
 }
@@ -17,10 +10,16 @@ body{
 }
 body,input, textarea{font-family:"Helvetica Neue", Helvetica, Microsoft Yahei, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif; color:@baseColor2;letter-spacing: 0.05em;}
 input,textarea, select{-webkit-appearance: none; user-select: text;}
+header{
+	height:0; width:100%;position:fixed;top:0;left:0;z-index:9;display:none;
+	text-align:center;
+	font-size:1.4em; line-height:100px;
+	transition: opacity @transTime, transform @transTime;
+}
 section{
-	width:100%;height:100%;display:table;position:relative;display:none;overflow:hidden;transition:transform @transTime; transform: translate(0,0);
+	width:100%;height:100%;display:table;position:relative;display:none;overflow:hidden;transition:opacity @transTime, transform @transTime; transform: translate(0,0);
 	.container{
-		background:@baseBg;transition: transform @transTime; transform: translate(0,0);display:table-cell; padding: 76px 36px 100px;
+		background:@baseBg;transition:opacity @transTime,  transform @transTime; transform: translate(0,0);display:table-cell; padding: 76px 36px 100px;
 		color:#999;
 		&.no-padding{
 			padding:0;
@@ -54,12 +53,6 @@ section{
 }
 
 
-header{
-	height:0; width:100%;position:fixed;top:0;left:0;z-index:9;display:none;
-	text-align:center;
-	font-size:1.4em; line-height:100px;
-	transition: transform @transTime;
-}
 
 .banner{
 	background:#232c34;
@@ -474,36 +467,6 @@ header{
 .main-useritem{
 	width:25%; padding: 14px 30px;font-size:.9em;float: left;
 	img{width:100%; border-radius: 50%;}
-}
-
-/*list1*/
-.essay-item,.video-item{ 
-	width:90%; margin: 20px auto 0;padding:20px;  border-radius:10px;background:@baseColor;color:#fff;
-	&.active{
-		background:darken(@baseColor,5%); 
-	}
-	h2{font-weight:100;}
-	aside{text-align:right;}
-}
-
-.video-item{
-	video{
-		border-radius:10px;margin:10px 0;
-	}
-}
-.article-box{
-	h2{font-weight:100; margin-top:20px;}
-	aside{text-align:right;}
-	.essay-head{
-		padding-bottom:10px; border-bottom:4px solid @baseColor;margin-bottom:50px;
-	}
-	.essay-content{
-		text-indent: 2em;
-		p{margin-top:20px;}
-		&:first-letter{
-			font-size:2em; color:@baseColor;
-		}
-	}
 }
 
 /**

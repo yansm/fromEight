@@ -7,21 +7,13 @@ pages.main = require('./mainView');
 
 pages.error = require('./errorView');
 
+pages.main = require('./mainView');
 
-pages.welcome1 = require('./welcome1View');
-pages.welcome2 = require('./welcome2View');
-pages.welcome3 = require('./welcome3View');
-
-pages.list1 = require('./list1View');
-pages.list2 = require('./list2View');
-pages.list3 = require('./list3View');
-pages.article1 = require('./article1View');
-pages.article2 = require('./article2View');
-
+pages.message = require('./messageView');
 
 
 module.exports = {
-	get: function (page) {
+	get: function (page) { 
 		return pages[page]|| null;
 	}
 } 
