@@ -10,6 +10,7 @@ pages.error = require('./errorView');
 pages.main = require('./mainView');
 
 pages.message = require('./messageView');
+pages.addmsg = require('./addMsgView');
 
 
 module.exports = {

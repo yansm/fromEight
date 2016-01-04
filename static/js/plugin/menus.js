@@ -2,6 +2,7 @@ var $ = require('zepto');
 
 var $body = $('body');
 var $menu, $head;
+var USERDATA;
 
 var menusManager = {
 	/**
@@ -28,6 +29,8 @@ var menusManager = {
 
 		$menu = $(menuHtml.join('')).appendTo($body);
 		$head = $(headHtml.join('')).appendTo($body);
+
+		USERDATA = data;
 		
 		$(document).on('touchmove','.menu-area', function(e){
 			e.preventDefault();
@@ -70,6 +73,16 @@ var menusManager = {
 			$menu.hide();
 			callback && callback();
 		}, 500);
+	},
+	/**
+	 * [getUserInfo 返回用户信息]
+	 * yansanmu 
+	 * @DateTime 2016-01-04T23:28:08+0800
+	 * @param    {Function}               callback [description]
+	 * @return   {[type]}                          [description]
+	 */
+	getUserInfo: function(callback){
+		return USERDATA;
 	}
 }
 

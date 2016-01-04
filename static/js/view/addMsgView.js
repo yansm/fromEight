@@ -2,11 +2,10 @@ var $ = require('zepto');
 var messageComponent = require('component/messageComponent');
 
 var tpl = 
-	'<header class="message-head" id="message-head"><div class="left-icon back-icon" data-toggle="fadein" data-target="main"></div></header>'
-		+'<section class="message-area" id="message-area">'
+	'<header class="addmsg-head" id="addmsg-head"><div class="left-icon back-icon" data-toggle="prev" data-target="message"></div></header>'
+		+'<section class="addmsg-area" id="addmsg-area">'
 			+'<div class="container no-padding">'
-				+'<div class="message-top"></div>'
-				+'<div class="message-add" data-toggle="next" data-target="addmsg"></div>'
+				
 			+'</div>' 
 		+'</section>'
 		
@@ -16,7 +15,6 @@ var showEvent;
 
 var buildPage = function($view, callback) {
 	var pageManager = this;
-	messageComponent.buildMsgTop($view.find('.message-top'), pageManager);
 	callback && callback();
 } 
 
@@ -25,5 +23,5 @@ module.exports = {
 	hiddenEvent: hiddenEvent,
 	showEvent: showEvent, 
 	buildPage: buildPage,
-	needReload: true,
+	//needReload: true,
 } 

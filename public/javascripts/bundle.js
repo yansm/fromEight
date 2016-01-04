@@ -870,7 +870,7 @@ attachFastClick(document.body);
 			signature = data.signature,
 			appId = data.appId;
 		 wx.config({
-			debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+			debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
 			appId: appId, // 必填，公众号的唯一标识
 			timestamp: timestamp, // 必填，生成签名的时间戳
 			nonceStr: nonceStr, // 必填，生成签名的随机串
@@ -940,65 +940,21 @@ $(function () {
 	
 
 }); 
-},{"fastclick":1,"manager/pageManager":5,"plugin/form":6,"plugin/jquery.cookie":7,"plugin/localStorageManager":8,"store/userStore":11,"tool/ajax":12,"tool/getUrlVar":13,"tool/sha1":14,"zepto":21}],3:[function(require,module,exports){
+},{"fastclick":1,"manager/pageManager":5,"plugin/form":6,"plugin/jquery.cookie":7,"plugin/localStorageManager":8,"store/userStore":10,"tool/ajax":11,"tool/getUrlVar":12,"tool/sha1":13,"zepto":21}],3:[function(require,module,exports){
 var $ = require('zepto');
-var listStore = require('store/listStore');
-
-var buildEssay = function(data){
-	var html = [];
-	for(var i = 0,length = data.length; i < length; i ++){
-		var item = data[i], title = item.title, author = item.author, url = item.url, time = item.time;
-		html.push('<div class="essay-item" data-url="'+url+'" data-time="'+time+'" data-author="'+ author +'" data-title="'+ title +'"><h2>'+ title +'</h2><aside>by '+ author +' '+ time +'</aside></div>')
-	}
-	return html.join('');
-}
-
-var buildVideo = function (data) {
-	var html = [];
-	for(var i = 0,length = data.length; i < length; i ++){
-		var item = data[i], title = item.title, author = item.author, url = item.url, time = item.time;
-		html.push('<div class="video-item"><h2>'+ title +'</h2>');
-		html.push('<video width="620" controls autobuffer>');
-		html.push('<source src="'+ url +'" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'></source>');
-		html.push('</video>');
-		html.push('<aside>by '+ author +' '+ time +'</aside></div>');
-	}
-	return html.join('');
-}
+var menus = require('plugin/menus')
 
 var storeComponent = {
-	buildList1:function($view, pageManager) {
-		listStore.getList1(function(data){
-			var list = data.list;
-			$view.append(buildEssay(list));
-		})
-		
-		$view.on('click','.essay-item',function(e){
-			var $this = $(this), data = $this.data();
-			pageManager.next('article1',data);
-		})
-	},
-	buildList2:function($view, pageManager) {
-		listStore.getList2(function(data){
-			var list = data.list;
-			$view.append(buildEssay(list));
-		})
-		
-		$view.on('click','.essay-item',function(e){
-			var $this = $(this), data = $this.data();
-			pageManager.next('article2',data);
-		})
-	},
-	buildList3:function($view, pageManager) { 
-		listStore.getList3(function(data){ 
-			var list = data.list;
-			$view.append(buildVideo(list));
-		});
+	buildMsgTop: function($item, pManager){
+		var data = menus.getUserInfo(),
+			userHead = data.userHead;
+		var html = '<div class="message-img"><img src="'+ userHead +'"></div>'
+		$item.append(html);
 	}
 }
 
-module.exports = storeComponent; 
-},{"store/listStore":10,"zepto":21}],4:[function(require,module,exports){
+module.exports = storeComponent;  
+},{"plugin/menus":9,"zepto":21}],4:[function(require,module,exports){
 var $ = require('zepto');
 var $ = require('zepto');
 var userStore = require('store/userStore');
@@ -1076,7 +1032,7 @@ var storeComponent = {
 }
 
 module.exports = storeComponent; 
-},{"store/userStore":11,"tool/ajax":12,"zepto":21}],5:[function(require,module,exports){
+},{"store/userStore":10,"tool/ajax":11,"zepto":21}],5:[function(require,module,exports){
 var $ = require('zepto'); 
 var pageContainer = require('view/viewContainer');
 
@@ -1974,6 +1930,7 @@ var $ = require('zepto');
 
 var $body = $('body');
 var $menu, $head;
+var USERDATA;
 
 var menusManager = {
 	/**
@@ -2000,6 +1957,8 @@ var menusManager = {
 
 		$menu = $(menuHtml.join('')).appendTo($body);
 		$head = $(headHtml.join('')).appendTo($body);
+
+		USERDATA = data;
 		
 		$(document).on('touchmove','.menu-area', function(e){
 			e.preventDefault();
@@ -2042,6 +2001,16 @@ var menusManager = {
 			$menu.hide();
 			callback && callback();
 		}, 500);
+	},
+	/**
+	 * [getUserInfo 返回用户信息]
+	 * yansanmu 
+	 * @DateTime 2016-01-04T23:28:08+0800
+	 * @param    {Function}               callback [description]
+	 * @return   {[type]}                          [description]
+	 */
+	getUserInfo: function(callback){
+		return USERDATA;
 	}
 }
 
@@ -2050,62 +2019,6 @@ var menusManager = {
 
 module.exports = menusManager;
 },{"zepto":21}],10:[function(require,module,exports){
-var $ = require('zepto');
-var ajax = require('tool/ajax');
-
-
-
-var Data = {};
-
-var storeManager = {
-	getList1:function(callback){
-		var data = {
-			list:[
-				{
-					title:'非诚勿扰，非礼勿视',
-					author: '闫三木',
-					time: '2010-11-08',
-					url: './essay/2010-11-08-feichegnwurao.json'
-				},{
-					title:'三俗少年',
-					author: '吕成',
-					time: '2015-12-23',
-					url: './essay/2015-12-23-sansu.json'
-				}
-			]
-		}
-		callback&& callback(data);
-	},
-	getList2:function(callback){
-		var data = {
-			list:[
-				{
-					title:'八班往事',
-					author: '闫三木',
-					time: '2015-12-23',
-					url: './essay/2015-12-23-baban.json'
-				}
-			]
-		}
-		callback&& callback(data);
-	},
-	getList3:function(callback){
-		var data = {
-			list:[
-				{
-					title:'二货少年',
-					author: '李园',
-					time: '2015-12-24',
-					url: './video/erhuoshaonian.mp4'
-				}
-			]
-		}
-		callback&& callback(data);
-	}
-}
-
-module.exports = storeManager;
-},{"tool/ajax":12,"zepto":21}],11:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -2150,7 +2063,7 @@ var storeManager = {
 } 
 
 module.exports = storeManager;
-},{"tool/ajax":12,"zepto":21}],12:[function(require,module,exports){
+},{"tool/ajax":11,"zepto":21}],11:[function(require,module,exports){
 var $ = require('zepto');
 
 module.exports = function (config) {
@@ -2168,14 +2081,14 @@ module.exports = function (config) {
 		}
 	});
 }  
-},{"zepto":21}],13:[function(require,module,exports){
+},{"zepto":21}],12:[function(require,module,exports){
 
 module.exports = function (url,key) {
 	var reg = new RegExp('(\\?|\\&)'+ key +'=([^\\&]+)')
 	var value = url.match(reg); 
 	return value&&value.length? value[2] : null;
 }
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -2385,7 +2298,35 @@ function binb2b64(binarray)
   return str;
 }
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
+var $ = require('zepto');
+var messageComponent = require('component/messageComponent');
+
+var tpl = 
+	'<header class="addmsg-head" id="addmsg-head"><div class="left-icon back-icon" data-toggle="prev" data-target="message"></div></header>'
+		+'<section class="addmsg-area" id="addmsg-area">'
+			+'<div class="container no-padding">'
+				
+			+'</div>' 
+		+'</section>'
+		
+var hiddenEvent;
+
+var showEvent;
+
+var buildPage = function($view, callback) {
+	var pageManager = this;
+	callback && callback();
+} 
+
+module.exports = {
+	tpl: tpl,
+	hiddenEvent: hiddenEvent,
+	showEvent: showEvent, 
+	buildPage: buildPage,
+	//needReload: true,
+} 
+},{"component/messageComponent":3,"zepto":21}],15:[function(require,module,exports){
 var $ = require('zepto');
 
 var tpl = 
@@ -2487,14 +2428,15 @@ module.exports = {
  
 },{"component/userComponent":4,"zepto":21}],17:[function(require,module,exports){
 var $ = require('zepto');
-var listComponent = require('component/listComponent');
+var messageComponent = require('component/messageComponent');
 
 var tpl = 
 	'<header class="message-head" id="message-head"><div class="left-icon back-icon" data-toggle="fadein" data-target="main"></div></header>'
 		+'<section class="message-area" id="message-area">'
 			+'<div class="container no-padding">'
-				
-			+'</div>'
+				+'<div class="message-top"></div>'
+				+'<div class="message-add" data-toggle="next" data-target="addmsg"></div>'
+			+'</div>' 
 		+'</section>'
 		
 var hiddenEvent;
@@ -2503,7 +2445,7 @@ var showEvent;
 
 var buildPage = function($view, callback) {
 	var pageManager = this;
-	//listComponent.buildList1($view.find('#list1'), pageManager);
+	messageComponent.buildMsgTop($view.find('.message-top'), pageManager);
 	callback && callback();
 } 
 
@@ -2514,7 +2456,7 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/listComponent":3,"zepto":21}],18:[function(require,module,exports){
+},{"component/messageComponent":3,"zepto":21}],18:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2608,6 +2550,7 @@ pages.error = require('./errorView');
 pages.main = require('./mainView');
 
 pages.message = require('./messageView');
+pages.addmsg = require('./addMsgView');
 
 
 module.exports = {
@@ -2615,7 +2558,7 @@ module.exports = {
 		return pages[page]|| null;
 	}
 } 
-},{"./errorView":15,"./mainView":16,"./messageView":17,"./regStuView":18,"./regUserView":19}],21:[function(require,module,exports){
+},{"./addMsgView":14,"./errorView":15,"./mainView":16,"./messageView":17,"./regStuView":18,"./regUserView":19}],21:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
