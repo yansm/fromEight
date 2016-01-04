@@ -31,6 +31,13 @@ var storeManager = {
 			callback: callback,
 			data: data
 		})
+	},
+	getTicket: function (data, callback){
+		ajax({
+			url: '/weixin/ticket',
+			callback: callback,
+			data: data
+		})
 	}
 } 
 

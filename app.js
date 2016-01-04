@@ -6,12 +6,16 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 global.reqlib = require('app-root-path').require;
+global.myConfig = {};
 
 var routes = reqlib('src/routes/index');
 var users = reqlib('src/routes/users');
 var weixin = reqlib('src/routes/weixin');
 
+
+
 var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -61,5 +65,9 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+
+var weixinManager = reqlib('src/plugins/weixinManager');
+weixinManager.setGobalConfigs();
 
 module.exports = app;

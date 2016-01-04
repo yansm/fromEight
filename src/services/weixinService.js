@@ -51,7 +51,49 @@ var service = {
 				callback && callback(false)
 			}
 		});
-	} 
+	},
+	/**
+	 * [getAccessToken getAccessToken]
+	 * @yansanmu github.com/yansm
+	 * @DateTime 2016-01-04T20:03:30+0800
+	 * @param     {Function}               callback [description]
+	 */
+	getAccessToken : function (callback) {
+		var url = '/cgi-bin/token?grant_type=client_credential&appid='+ weixinConfig.APPID +'&secret=' + weixinConfig.APPSECRET;
+		var options = {
+			host: weixinConfig.HOST,
+		    path: url,
+		}
+		getJson(options, function(status, res){
+			if(status===200){
+				callback && callback(res);
+			}else{
+				callback && callback(false)
+			}
+		});
+	},
+	/**
+	 * [getTicket 获取ticket]
+	 * @yansanmu github.com/yansm
+	 * @DateTime 2016-01-04T20:16:58+0800
+	 * @param    {[type]}                 accessToken [description]
+	 * @param    {Function}               callback    [description]
+	 * @return   {[type]}                             [description]
+	 */
+	getTicket : function (accessToken, callback) {
+		var url = '/cgi-bin/ticket/getticket?access_token='+ accessToken +'&type=jsapi';
+		var options = {
+			host: weixinConfig.HOST,
+		    path: url,
+		}
+		getJson(options, function(status, res){
+			if(status===200){
+				callback && callback(res);
+			}else{
+				callback && callback(false)
+			}
+		});
+	}
 }
 
 module.exports = service;
