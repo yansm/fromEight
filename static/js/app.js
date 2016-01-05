@@ -33,7 +33,7 @@ attachFastClick(document.body);
 			signature: signature,// 必填，签名，见附录1
 			jsApiList: [
 				'chooseImage',     
-				'previewImage',     
+				'previewImage',      
 				'uploadImage',     
 				'downloadImage',    
 				'scanQRCode',     
@@ -69,7 +69,7 @@ $(function () {
 			} 
 		}else{
 
-			pageManager.init($('body'),'main'); 
+			pageManager.init($('body'),'addmsg'); 
 			pageManager.buildMenu({nickName:'三木',userName:'闫三木',stuNum:'20093514',userHead: '../images/welcome1.jpg'});
 		}
 	});
@@ -93,6 +93,7 @@ $(function () {
 			var $this = $(this), target = $this.data('target'); 
 			pageManager.fadein(target);
 		})
+		
 	
 
 }); 

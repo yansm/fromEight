@@ -877,7 +877,7 @@ attachFastClick(document.body);
 			signature: signature,// 必填，签名，见附录1
 			jsApiList: [
 				'chooseImage',     
-				'previewImage',     
+				'previewImage',      
 				'uploadImage',     
 				'downloadImage',    
 				'scanQRCode',     
@@ -913,7 +913,7 @@ $(function () {
 			} 
 		}else{
 
-			pageManager.init($('body'),'main'); 
+			pageManager.init($('body'),'addmsg'); 
 			pageManager.buildMenu({nickName:'三木',userName:'闫三木',stuNum:'20093514',userHead: '../images/welcome1.jpg'});
 		}
 	});
@@ -937,24 +937,65 @@ $(function () {
 			var $this = $(this), target = $this.data('target'); 
 			pageManager.fadein(target);
 		})
+		
 	
 
 }); 
-},{"fastclick":1,"manager/pageManager":5,"plugin/form":6,"plugin/jquery.cookie":7,"plugin/localStorageManager":8,"store/userStore":10,"tool/ajax":11,"tool/getUrlVar":12,"tool/sha1":13,"zepto":21}],3:[function(require,module,exports){
+},{"fastclick":1,"manager/pageManager":5,"plugin/form":6,"plugin/jquery.cookie":7,"plugin/localStorageManager":8,"store/userStore":11,"tool/ajax":12,"tool/getUrlVar":13,"tool/sha1":14,"zepto":22}],3:[function(require,module,exports){
 var $ = require('zepto');
 var menus = require('plugin/menus')
+var messageStore = require('store/messageStore');
 
 var storeComponent = {
+	/**
+	 * [buildMsgTop 给状态墙加头像]
+	 * @yansanmu github.com/yansm
+	 * @DateTime 2016-01-05T18:05:38+0800
+	 * @param    {[type]}                 $item    [description]
+	 * @param    {[type]}                 pManager [description]
+	 * @return   {[type]}                          [description]
+	 */
 	buildMsgTop: function($item, pManager){
 		var data = menus.getUserInfo(),
 			userHead = data.userHead;
 		var html = '<div class="message-img"><img src="'+ userHead +'"></div>'
 		$item.append(html);
+	},
+	/**
+	 * [buildAddForm 设置add msg表单]
+	 * @yansanmu github.com/yansm
+	 * @DateTime 2016-01-05T18:06:02+0800
+	 * @param    {[type]}                 $item    [description]
+	 * @param    {[type]}                 pManager [description]
+	 * @return   {[type]}                          [description]
+	 */
+	buildAddForm: function($item, pManager){
+		$item.formValidate(); 
+		var $submit = $item.find('[data-toggle=submit]');
+		$item.on('click', '[data-toggle="submit"]', function () {
+			$item.formValidate('checkForm', function (flag){  
+				if(!flag) return;
+				$item.formValidate('submit', function (data) { 
+					messageStore.addMsg(data, function (e) {
+						if(e.code){
+							pManager.showErr(e.msg||'发布失败');
+							$item.formValidate('resetSubmit');
+						}else{
+							$item.find('[name="content"]').val('');
+							pManager.prev('message');
+						}
+					});
+				});
+			})
+		}).on('bsFormValid', function (e, flags) {
+			if(flags.content) $submit.addClass('able');
+			else $submit.removeClass('able');
+		}) 
 	}
 }
 
 module.exports = storeComponent;  
-},{"plugin/menus":9,"zepto":21}],4:[function(require,module,exports){
+},{"plugin/menus":9,"store/messageStore":10,"zepto":22}],4:[function(require,module,exports){
 var $ = require('zepto');
 var $ = require('zepto');
 var userStore = require('store/userStore');
@@ -1032,7 +1073,7 @@ var storeComponent = {
 }
 
 module.exports = storeComponent; 
-},{"store/userStore":10,"tool/ajax":11,"zepto":21}],5:[function(require,module,exports){
+},{"store/userStore":11,"tool/ajax":12,"zepto":22}],5:[function(require,module,exports){
 var $ = require('zepto'); 
 var pageContainer = require('view/viewContainer');
 
@@ -1633,7 +1674,7 @@ module.exports = moduleManager;
 
 
 
-},{"plugin/menus":9,"view/viewContainer":20,"zepto":21}],6:[function(require,module,exports){
+},{"plugin/menus":9,"view/viewContainer":21,"zepto":22}],6:[function(require,module,exports){
 var $ = require('zepto');
 
 
@@ -1752,21 +1793,10 @@ var $ = require('zepto');
 	}
 	
 	FormValidate.VALIDATE = {
-		phone: {
-			reg: /^(13[0-9]|14[0-9]|15[0-9]|18[0-9])\d{8}$/,
-			msg: '请输入正确手机号'
-		},
-		idcard: {
-			reg: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/,
-			msg: '请输入正确身份证'
-		},
-		number: function (value) {
-			if(/^[0-9]+(.[0-9]+)?$/.test(value))
-				return false;
-			else{
-				$(this).val('');
-				return '请输入正确金额'
-			}
+		
+		msg: function (value) {
+			if(value.length>120) return '最多输入120字~';
+			else return false;
 		}
 	}	
 	
@@ -1793,7 +1823,7 @@ var $ = require('zepto');
 	}
 	
 module.exports = null;
-},{"zepto":21}],7:[function(require,module,exports){
+},{"zepto":22}],7:[function(require,module,exports){
 
 
 /*!
@@ -1911,7 +1941,7 @@ module.exports = null;
 
 }));
 
-},{"zepto":21}],8:[function(require,module,exports){
+},{"zepto":22}],8:[function(require,module,exports){
 var flag = !!window.localStorage;
 
 module.exports = {
@@ -2018,7 +2048,25 @@ var menusManager = {
  
 
 module.exports = menusManager;
-},{"zepto":21}],10:[function(require,module,exports){
+},{"zepto":22}],10:[function(require,module,exports){
+var $ = require('zepto');
+var ajax = require('tool/ajax');
+
+var storeManager = {
+	
+	addMsg: function (data,callback) {
+		// body...
+		ajax({
+			url:'/message/add',
+			callback:callback,
+			data:data
+		});
+	},
+	
+} 
+
+module.exports = storeManager;
+},{"tool/ajax":12,"zepto":22}],11:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -2063,7 +2111,7 @@ var storeManager = {
 } 
 
 module.exports = storeManager;
-},{"tool/ajax":11,"zepto":21}],11:[function(require,module,exports){
+},{"tool/ajax":12,"zepto":22}],12:[function(require,module,exports){
 var $ = require('zepto');
 
 module.exports = function (config) {
@@ -2081,14 +2129,14 @@ module.exports = function (config) {
 		}
 	});
 }  
-},{"zepto":21}],12:[function(require,module,exports){
+},{"zepto":22}],13:[function(require,module,exports){
 
 module.exports = function (url,key) {
 	var reg = new RegExp('(\\?|\\&)'+ key +'=([^\\&]+)')
 	var value = url.match(reg); 
 	return value&&value.length? value[2] : null;
 }
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -2298,7 +2346,7 @@ function binb2b64(binarray)
   return str;
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var $ = require('zepto');
 var messageComponent = require('component/messageComponent');
 
@@ -2306,7 +2354,12 @@ var tpl =
 	'<header class="addmsg-head" id="addmsg-head"><div class="left-icon back-icon" data-toggle="prev" data-target="message"></div></header>'
 		+'<section class="addmsg-area" id="addmsg-area">'
 			+'<div class="container no-padding">'
-				
+				+'<div id="addMsgForm" class="msg-form" role="form">'
+					+'<div class="form-group">'
+						+'<div class="form-control" id="shopType"><textarea name="content" placeholder="说点什么···" data-required=true data-validate="msg"></textarea></div>'
+					+'</div>'
+					+'<div class="msg-btn" data-toggle="submit">发布</div>'
+				+'<div>'
 			+'</div>' 
 		+'</section>'
 		
@@ -2315,7 +2368,8 @@ var hiddenEvent;
 var showEvent;
 
 var buildPage = function($view, callback) {
-	var pageManager = this;
+	var pageManager = this; 
+	messageComponent.buildAddForm($view.find('#addMsgForm'), pageManager);
 	callback && callback();
 } 
 
@@ -2326,7 +2380,7 @@ module.exports = {
 	buildPage: buildPage,
 	//needReload: true,
 } 
-},{"component/messageComponent":3,"zepto":21}],15:[function(require,module,exports){
+},{"component/messageComponent":3,"zepto":22}],16:[function(require,module,exports){
 var $ = require('zepto');
 
 var tpl = 
@@ -2383,7 +2437,7 @@ module.exports = {
 	hideMenu: 'auto',
 	errorList: errorList
 } 	
-},{"zepto":21}],16:[function(require,module,exports){
+},{"zepto":22}],17:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2426,7 +2480,7 @@ module.exports = {
 	buildPage: buildPage
 }
  
-},{"component/userComponent":4,"zepto":21}],17:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":22}],18:[function(require,module,exports){
 var $ = require('zepto');
 var messageComponent = require('component/messageComponent');
 
@@ -2456,7 +2510,7 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/messageComponent":3,"zepto":21}],18:[function(require,module,exports){
+},{"component/messageComponent":3,"zepto":22}],19:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2492,7 +2546,7 @@ module.exports = {
 	needReload: true
 } 
  
-},{"component/userComponent":4,"zepto":21}],19:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":22}],20:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2537,7 +2591,7 @@ module.exports = {
 	needReload: true
 } 
  
-},{"component/userComponent":4,"zepto":21}],20:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":22}],21:[function(require,module,exports){
 var pages = {};
 
 pages.regstu = require('./regStuView');
@@ -2558,7 +2612,7 @@ module.exports = {
 		return pages[page]|| null;
 	}
 } 
-},{"./addMsgView":14,"./errorView":15,"./mainView":16,"./messageView":17,"./regStuView":18,"./regUserView":19}],21:[function(require,module,exports){
+},{"./addMsgView":15,"./errorView":16,"./mainView":17,"./messageView":18,"./regStuView":19,"./regUserView":20}],22:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/

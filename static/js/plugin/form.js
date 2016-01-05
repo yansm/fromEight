@@ -116,21 +116,10 @@ var $ = require('zepto');
 	}
 	
 	FormValidate.VALIDATE = {
-		phone: {
-			reg: /^(13[0-9]|14[0-9]|15[0-9]|18[0-9])\d{8}$/,
-			msg: '请输入正确手机号'
-		},
-		idcard: {
-			reg: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/,
-			msg: '请输入正确身份证'
-		},
-		number: function (value) {
-			if(/^[0-9]+(.[0-9]+)?$/.test(value))
-				return false;
-			else{
-				$(this).val('');
-				return '请输入正确金额'
-			}
+		
+		msg: function (value) {
+			if(value.length>120) return '最多输入120字~';
+			else return false;
 		}
 	}	
 	

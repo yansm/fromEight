@@ -16,9 +16,37 @@
 }
 .message-add{
 	width:120px; height: 120px; position: fixed;
-	border-radius: 50%; background: #000; opacity: .4;
+	border-radius: 50%; background: rgba(255,255,255,.5) url(../images/pan.jpg) center center no-repeat; 
 	bottom:30px; left:30px;
 	&:active{
-		opacity: .8;
+		background-color: rgba(255, 255, 255, 0.8);
+	}
+} 
+.msg-form{
+	textarea{
+		border:0; height: 400px; width: 100%; background: transparent; font-size:1.2em;
+		padding: 100px 52px 46px;
+		&:active,&:focus{
+			outline: 0;
+		}
+	}
+}
+.msg-btn{
+	text-align: center; border-top: 1px solid #d5d5d5; border-bottom: 1px solid #d5d5d5; 
+	font-size:1.3em; line-height: 2.4em; transition: .3s;
+	&.able{
+		color:#333; text-shadow: 0 0px 5px #666;
+	}
+}
+
+.addmsg-area{
+	.container{
+		background: #fff;
+	}
+	.form-group .form-control .error-msg{
+		font-size: .9em; border-radius: 0; background: #000; bottom:0;top:auto;
+	}
+	.form-group{
+		margin: 0;
 	}
 }

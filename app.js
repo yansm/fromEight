@@ -11,6 +11,7 @@ global.myConfig = {};
 var routes = reqlib('src/routes/index');
 var users = reqlib('src/routes/users');
 var weixin = reqlib('src/routes/weixin');
+var message = reqlib('src/routes/message');
 
 
 
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/user', users);
 app.use('/weixin', weixin);
+app.use('/message', message);
 
 app.use(require('connect-livereload')());
 
