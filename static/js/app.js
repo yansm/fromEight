@@ -14,7 +14,29 @@ require('plugin/form');
 var getUrlVar = require('tool/getUrlVar'); 
  
 attachFastClick(document.body); 
- 
+
+/*上传微信照片*/
+var uploadImageFn = function (localIds, callback) {
+	var localId = localIds[0];
+	wx.uploadImage({
+		localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
+		isShowProgressTips: 1, // 默认为1，显示进度提示
+		success: function (res) {
+			var serverId = res.serverId; // 返回图片的服务器端ID
+			$('<div class="images-box"><img class="" src="'+ localId +'"></div>').prependTo($parent);
+			callback && callback(serverId);
+			localIds.shift();
+			if(localIds.length){
+				uploadImageFn(localIds,callback);
+			}
+		},
+		fail: function (res) {
+			alert(JSON.stringify(arguments));
+			pageManager.showErr('图片上传失败');
+		}
+	});
+}
+
 /*微信jssdk签名*/
  var wxReady = function (url){ 
 	userStore.getTicket({url:url}, function(e) {
@@ -41,11 +63,45 @@ attachFastClick(document.body);
 		wx.ready(function () {
 			//关闭顶部部分按钮
 			wx.hideOptionMenu();
+
+			$(document)
+				//选择图片
+				.on('click','[data-toggle="addImg"]',function () {
+					var $this = $(this),serverIds = $this.data('serverIds')||[]; count = serverIds.length, $parent = $this.parent();
+					if(count >= 9) {
+						pageManager.showErr('最大可上传9张');
+					}
+					wx.chooseImage({
+						count: 9-count, // 默认9
+						success: function (res) {
+							var localIds = res.localIds, length = localIds.length;
+							
+							setTimeout(function () { 
+								$this.data('count', count+length);
+								uploadImageFn(localIds, function (serverId) { 
+									
+									serverIds.push(serverId); 
+									//alert(JSON.stringify(serverIds));
+									
+									$this.data('serverIds',serverIds);
+									$parent.find('input').val(serverIds.join(','));
+								})
+								
+							}, 100); 
+							
+						},
+						error:function(){
+							//alert(JSON.stringify(arguments));
+						}
+					});
+				});
+
 		});		
 		wx.error(function(res){
 			alert(JSON.stringify(res));
 		});
 	});
+
 
 	
 
@@ -68,7 +124,7 @@ $(function () {
 			} 
 		}else{
 
-			pageManager.init($('body'),'message'); 
+			pageManager.init($('body'),'addmsg'); 
 			pageManager.buildMenu({nickName:'三木',userName:'闫三木',stuNum:'20093514',userHead: '../images/welcome1.jpg'});
 		}
 	});

@@ -31,6 +31,10 @@ BuildFeeds.prototype.main = function () {
 	
 }
 
+BuildFeeds.prototype.removeScroll = function (){
+	paging.clearScroll('cashlist');
+};
+
 BuildFeeds.prototype.list = function () {
 	var me = this, $item = me.ele;
 	
@@ -103,7 +107,7 @@ BuildFeeds.prototype.buildImgs = function (data, stamp) {
 
 BuildFeeds.DEFAULTS = {};
 
-module.exports = function ($item, options) {
+module.exports = function ($item, option) {
 	$item.each(function (item) {   
 		var $this = $(this)
 			,data    = $this.data('teemoFeeds')

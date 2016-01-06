@@ -35,10 +35,11 @@ var storeComponent = {
 			$item.formValidate('checkForm', function (flag){  
 				if(!flag) return;
 				$item.formValidate('submit', function (data) { 
+					//alert(JSON.stringify(data));
 					messageStore.addMsg(data, function (e) {
 						if(e.code){
 							pManager.showErr(e.msg||'发布失败');
-							$item.formValidate('resetSubmit');
+							$item.formValidate('resetSubmit'); 
 						}else{
 							$item.find('[name="content"]').val('');
 							pManager.prev('message');
@@ -61,6 +62,9 @@ var storeComponent = {
 	 */
 	buildMsgList: function ($item, pManager){
 		feeds($item,{});
+	},
+	removeMsgList: function ($item, pManager){ 
+		feeds($item,'removeScroll');
 	}
 }
 

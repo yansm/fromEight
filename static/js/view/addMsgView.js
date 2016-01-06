@@ -9,6 +9,10 @@ var tpl =
 					+'<div class="form-group">'
 						+'<div class="form-control" id="shopType"><textarea name="content" placeholder="说点什么···" data-required=true data-validate="msg"></textarea></div>'
 					+'</div>'
+					+'<div class="form-group images-area fix">'
+						+'<div class="images-add" data-toggle="addImg"></div>'
+						+'<input name="images" type="hidden">'
+					+'</div>'
 					+'<div class="msg-btn" data-toggle="submit">发布</div>'
 				+'<div>'
 			+'</div>' 
@@ -29,5 +33,5 @@ module.exports = {
 	hiddenEvent: hiddenEvent,
 	showEvent: showEvent, 
 	buildPage: buildPage,
-	//needReload: true,
+	needReload: true,
 } 

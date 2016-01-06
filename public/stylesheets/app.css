@@ -1580,6 +1580,25 @@ section .container.dark-bg {
   left: 50%;
   top: 50%;
 }
+.images-area {
+  padding: 0 10px;
+}
+.images-box,
+.images-add {
+  width: 130px;
+  height: 130px;
+  margin: 2px 8px;
+  float: left;
+}
+.images-box img,
+.images-add img {
+  width: 100%;
+  height: 100%;
+}
+.images-add {
+  background: url(../images/camera.png) no-repeat center center;
+  border: 3px solid #ccc;
+}
 /**
  * 动画效果
  */

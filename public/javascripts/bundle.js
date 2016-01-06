@@ -858,7 +858,29 @@ require('plugin/form');
 var getUrlVar = require('tool/getUrlVar'); 
  
 attachFastClick(document.body); 
- 
+
+/*上传微信照片*/
+var uploadImageFn = function (localIds, callback) {
+	var localId = localIds[0];
+	wx.uploadImage({
+		localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
+		isShowProgressTips: 1, // 默认为1，显示进度提示
+		success: function (res) {
+			var serverId = res.serverId; // 返回图片的服务器端ID
+			$('<div class="images-box"><img class="" src="'+ localId +'"></div>').prependTo($parent);
+			callback && callback(serverId);
+			localIds.shift();
+			if(localIds.length){
+				uploadImageFn(localIds,callback);
+			}
+		},
+		fail: function (res) {
+			alert(JSON.stringify(arguments));
+			pageManager.showErr('图片上传失败');
+		}
+	});
+}
+
 /*微信jssdk签名*/
  var wxReady = function (url){ 
 	userStore.getTicket({url:url}, function(e) {
@@ -885,11 +907,45 @@ attachFastClick(document.body);
 		wx.ready(function () {
 			//关闭顶部部分按钮
 			wx.hideOptionMenu();
+
+			$(document)
+				//选择图片
+				.on('click','[data-toggle="addImg"]',function () {
+					var $this = $(this),serverIds = $this.data('serverIds')||[]; count = serverIds.length, $parent = $this.parent();
+					if(count >= 9) {
+						pageManager.showErr('最大可上传9张');
+					}
+					wx.chooseImage({
+						count: 9-count, // 默认9
+						success: function (res) {
+							var localIds = res.localIds, length = localIds.length;
+							
+							setTimeout(function () { 
+								$this.data('count', count+length);
+								uploadImageFn(localIds, function (serverId) { 
+									
+									serverIds.push(serverId); 
+									//alert(JSON.stringify(serverIds));
+									
+									$this.data('serverIds',serverIds);
+									$parent.find('input').val(serverIds.join(','));
+								})
+								
+							}, 100); 
+							
+						},
+						error:function(){
+							//alert(JSON.stringify(arguments));
+						}
+					});
+				});
+
 		});		
 		wx.error(function(res){
 			alert(JSON.stringify(res));
 		});
 	});
+
 
 	
 
@@ -912,7 +968,7 @@ $(function () {
 			} 
 		}else{
 
-			pageManager.init($('body'),'message'); 
+			pageManager.init($('body'),'addmsg'); 
 			pageManager.buildMenu({nickName:'三木',userName:'闫三木',stuNum:'20093514',userHead: '../images/welcome1.jpg'});
 		}
 	});
@@ -978,10 +1034,11 @@ var storeComponent = {
 			$item.formValidate('checkForm', function (flag){  
 				if(!flag) return;
 				$item.formValidate('submit', function (data) { 
+					//alert(JSON.stringify(data));
 					messageStore.addMsg(data, function (e) {
 						if(e.code){
 							pManager.showErr(e.msg||'发布失败');
-							$item.formValidate('resetSubmit');
+							$item.formValidate('resetSubmit'); 
 						}else{
 							$item.find('[name="content"]').val('');
 							pManager.prev('message');
@@ -1004,6 +1061,9 @@ var storeComponent = {
 	 */
 	buildMsgList: function ($item, pManager){
 		feeds($item,{});
+	},
+	removeMsgList: function ($item, pManager){ 
+		feeds($item,'removeScroll');
 	}
 }
 
@@ -1724,6 +1784,10 @@ BuildFeeds.prototype.main = function () {
 	
 }
 
+BuildFeeds.prototype.removeScroll = function (){
+	paging.clearScroll('cashlist');
+};
+
 BuildFeeds.prototype.list = function () {
 	var me = this, $item = me.ele;
 	
@@ -1796,7 +1860,7 @@ BuildFeeds.prototype.buildImgs = function (data, stamp) {
 
 BuildFeeds.DEFAULTS = {};
 
-module.exports = function ($item, options) {
+module.exports = function ($item, option) {
 	$item.each(function (item) {   
 		var $this = $(this)
 			,data    = $this.data('teemoFeeds')
@@ -2189,7 +2253,7 @@ var paging = {
 	buildScroll: function (module, $item, callback) {	
 		
 		callback();
-		$(window).on('scroll.'+module, function () { 
+		$(window).on('scroll.'+module, function () { console.log(123);
 			if($item.data('isLoading')) return;
 			if(Math.abs($(window).scrollTop() - $(document).height() + $(window).height()) < 200){
 				var page = $item.data('page');
@@ -2211,7 +2275,7 @@ var paging = {
 			} 
 		})
 	} ,
-	clearScroll: function (module) {
+	clearScroll: function (module) { 
 		$(window).off('scroll.'+module);
 	}
 } 
@@ -2340,6 +2404,10 @@ var tpl =
 					+'<div class="form-group">'
 						+'<div class="form-control" id="shopType"><textarea name="content" placeholder="说点什么···" data-required=true data-validate="msg"></textarea></div>'
 					+'</div>'
+					+'<div class="form-group images-area fix">'
+						+'<div class="images-add" data-toggle="addImg"></div>'
+						+'<input name="images" type="hidden">'
+					+'</div>'
 					+'<div class="msg-btn" data-toggle="submit">发布</div>'
 				+'<div>'
 			+'</div>' 
@@ -2360,7 +2428,7 @@ module.exports = {
 	hiddenEvent: hiddenEvent,
 	showEvent: showEvent, 
 	buildPage: buildPage,
-	//needReload: true,
+	needReload: true,
 } 
 },{"component/messageComponent":3,"zepto":24}],18:[function(require,module,exports){
 var $ = require('zepto');
@@ -2480,7 +2548,10 @@ var tpl =
 			+'</div>' 
 		+'</section>'
 		
-var hiddenEvent;
+var hiddenEvent = function (view){
+	var pageManager = this;
+	messageComponent.removeMsgList(view.content.find('.message-list'), pageManager);
+};
 
 var showEvent;
 

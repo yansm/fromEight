@@ -15,7 +15,10 @@ var tpl =
 			+'</div>' 
 		+'</section>'
 		
-var hiddenEvent;
+var hiddenEvent = function (view){
+	var pageManager = this;
+	messageComponent.removeMsgList(view.content.find('.message-list'), pageManager);
+};
 
 var showEvent;
 
