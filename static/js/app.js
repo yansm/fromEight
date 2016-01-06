@@ -23,6 +23,7 @@ var uploadImageFn = function (localIds, callback) {
 		isShowProgressTips: 1, // 默认为1，显示进度提示
 		success: function (res) {
 			var serverId = res.serverId; // 返回图片的服务器端ID
+			//alert(JSON.stringify(arguments));
 			$('<div class="images-box"><img class="" src="'+ localId +'"></div>').prependTo($parent);
 			callback && callback(serverId);
 			localIds.shift();

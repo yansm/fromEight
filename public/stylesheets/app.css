@@ -1332,6 +1332,7 @@ section .container.dark-bg {
   opacity: .6;
   bottom: 30px;
   left: 30px;
+  z-index: 18;
 }
 .message-add:active {
   opacity: 1;

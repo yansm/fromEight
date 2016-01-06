@@ -1,7 +1,8 @@
-
-
 var https = require('https');
 var weixinConfig = reqlib('config/weixin-config');
+
+var http = require("http");
+var fs = require("fs");
 
 var getJson = reqlib('src/plugins/getjson');
 
@@ -92,6 +93,47 @@ var service = {
 			}else{
 				callback && callback(false)
 			}
+		});
+	},
+	/**
+	 * [getMedia 获取附件]
+	 * yansanmu 
+	 * @DateTime 2016-01-06T23:07:01+0800
+	 * @param    {[type]}                 accessToken [description]
+	 * @param    {[type]}                 mediaId     [description]
+	 * @param    {Function}               callback    [description]
+	 * @return   {[type]}                             [description]
+	 */
+	getMedia : function (accessToken,mediaId,callback) {
+		var url = '/cgi-bin/media/get?access_token='+ accessToken +'&media_id=' + mediaId;
+		
+		http.get(weixinConfig.MEDIAHOST + url , function(res) {
+		    var size = 0;
+		    var chunks = [];
+		    var fileName = res.headers['content-disposition'].match(/filename="(.+)"/)[1];
+		  res.on('data', function(chunk){
+		      size += chunk.length;
+		      chunks.push(chunk);
+		  });
+		  res.on('end', function(){
+		        var data = Buffer.concat(chunks, size);
+		        var pathName = '/media/'+fileName;
+		        fs.writeFile('public'+pathName, data, function (err) {
+				    if (err) {
+				    	throw err ;
+				    	callback && callback(false);
+				    }
+				    else{
+				    	callback && callback(pathName);
+				    	console.log('File '+ fileName +' Saved !'); //文件被保存
+				    }
+				    
+			    }) ;
+		        
+		  });
+		}).on('error', function(e) {
+			callback && callback(false);
+		    console.log("Got error: " + e.message);
 		});
 	}
 }

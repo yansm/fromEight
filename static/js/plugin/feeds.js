@@ -71,31 +71,34 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 			userName = item.userName, 
 			nickName = item.nickName,
 			name = nickName?(nickName+'('+ userName +')'): userName,
-			time = format(new Date(+item.createTime), 'yyyy-MM-dd hh:mm');
+			time = format(new Date(+item.createTime), 'yyyy-MM-dd hh:mm'),
+			imgHtml = this.buildImgs(item.images && item.images.split(','));
 			
 		
 		html.push('<div class="feed-item"><div class="feed-head fix">');
 		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
 		html.push('</div>');
-		//	html.push(imgHtml);
+		html.push(imgHtml);
 		html.push('<div class="fees-desc">'+ content +'</div>');
 		html.push('</div>');
 			 
 	}
 	return html.join('');
-}
-
-BuildFeeds.prototype.buildImgs = function (data, stamp) {
+} 
+ 
+BuildFeeds.prototype.buildImgs = function (data) {
+	console.log(data);
+	if(!data || !data.length) return '';
 	var length = data.length,  original = 'original', type = 'small', className = 'large'; 
 	if(length > 1 && length <5){ type = 'tiny'; className = 'small' } 
 	else if(length > 4){ type = 'tiny'; className = 'tiny'};
 	
 	var html = []; 
-	html.push('<ul class="fix feed-photos '+ className +'" data-stamp="'+ stamp +'">');
+	html.push('<ul class="fix feed-photos '+ className +'" >');
 	
 	for(var i = 0; i < length; i ++){
-		var img = data[i], photos = img.photos, url = decodeURIComponent(photos[type]) , originalUrl = decodeURIComponent(photos[original]), imgType = img.width > img.height ? 'wtype': 'htype'; 
-		html.push('<li oUrl='+ originalUrl +'><div class="feed-frame">&nbsp;<img class="'+ imgType +'" xSrc="'+ url +'" />&nbsp;</div></li>')
+		var img = data[i], url = img , originalUrl = img, imgType = 'wtype';//img.width > img.height ? 'wtype': 'htype'; 
+		html.push('<li oUrl='+ originalUrl +'><div class="feed-frame">&nbsp;<img style="opacity:1" class="'+ imgType +'" src="'+ url +'" />&nbsp;</div></li>')
 	};
 	
 	html.push('</ul>');
