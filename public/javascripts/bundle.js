@@ -2504,7 +2504,7 @@ var buildPage = function($view, callback) {
 } 
 
 module.exports = {
-	tpl: tpl,
+	tpl: tpl, 
 	hiddenEvent: hiddenEvent,
 	showEvent: showEvent, 
 	buildPage: buildPage,
