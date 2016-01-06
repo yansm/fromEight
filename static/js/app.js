@@ -2,7 +2,6 @@ var $ = require('zepto');
 var attachFastClick = require('fastclick');
 var pageManager = require('manager/pageManager');
 
-var sha1 = require('tool/sha1');
 var cookie = require('plugin/jquery.cookie');
 var localStorageManager = require('plugin/localStorageManager');
 
@@ -13,7 +12,7 @@ require('plugin/form');
 
 
 var getUrlVar = require('tool/getUrlVar'); 
-
+ 
 attachFastClick(document.body); 
  
 /*微信jssdk签名*/
@@ -69,7 +68,7 @@ $(function () {
 			} 
 		}else{
 
-			pageManager.init($('body'),'addmsg'); 
+			pageManager.init($('body'),'message'); 
 			pageManager.buildMenu({nickName:'三木',userName:'闫三木',stuNum:'20093514',userHead: '../images/welcome1.jpg'});
 		}
 	});

@@ -496,6 +496,9 @@ ModuleManager.prototype.setTimeout = function () {
 				});	
 			$content.css({	
 				'position': 'relative',
+			}).find('.container').css({
+				'-webkit-transform':'none',
+				'transform':'none',
 			});
 			$body.scrollTop(0);
 			me.flag = false;

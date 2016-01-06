@@ -7,6 +7,11 @@ var tpl =
 			+'<div class="container no-padding">'
 				+'<div class="message-top"></div>'
 				+'<div class="message-add" data-toggle="next" data-target="addmsg"></div>'
+				+'<div class="message-list"  data-toggle="feeds" data-type="list"><div class="feeds-list"></div><div class="toolbar">'
+					+'<div class="toolbar-loaded"></div>'
+					+'<div class="toolbar-loading">更新中···</div>'
+					+'<div class="toolbar-end">到底了</div>'
+				+'</div></div>'
 			+'</div>' 
 		+'</section>'
 		
@@ -17,6 +22,7 @@ var showEvent;
 var buildPage = function($view, callback) {
 	var pageManager = this;
 	messageComponent.buildMsgTop($view.find('.message-top'), pageManager);
+	messageComponent.buildMsgList($view.find('.message-list'), pageManager);
 	callback && callback();
 } 
 

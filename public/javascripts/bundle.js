@@ -846,7 +846,6 @@ var $ = require('zepto');
 var attachFastClick = require('fastclick');
 var pageManager = require('manager/pageManager');
 
-var sha1 = require('tool/sha1');
 var cookie = require('plugin/jquery.cookie');
 var localStorageManager = require('plugin/localStorageManager');
 
@@ -857,7 +856,7 @@ require('plugin/form');
 
 
 var getUrlVar = require('tool/getUrlVar'); 
-
+ 
 attachFastClick(document.body); 
  
 /*微信jssdk签名*/
@@ -913,7 +912,7 @@ $(function () {
 			} 
 		}else{
 
-			pageManager.init($('body'),'addmsg'); 
+			pageManager.init($('body'),'message'); 
 			pageManager.buildMenu({nickName:'三木',userName:'闫三木',stuNum:'20093514',userHead: '../images/welcome1.jpg'});
 		}
 	});
@@ -941,10 +940,13 @@ $(function () {
 	
 
 }); 
-},{"fastclick":1,"manager/pageManager":5,"plugin/form":6,"plugin/jquery.cookie":7,"plugin/localStorageManager":8,"store/userStore":11,"tool/ajax":12,"tool/getUrlVar":13,"tool/sha1":14,"zepto":22}],3:[function(require,module,exports){
+},{"fastclick":1,"manager/pageManager":5,"plugin/form":7,"plugin/jquery.cookie":8,"plugin/localStorageManager":9,"store/userStore":13,"tool/ajax":14,"tool/getUrlVar":16,"zepto":24}],3:[function(require,module,exports){
 var $ = require('zepto');
 var menus = require('plugin/menus')
 var messageStore = require('store/messageStore');
+var feeds = require('plugin/feeds');
+
+var paging = require('plugin/paging');
 
 var storeComponent = {
 	/**
@@ -991,11 +993,22 @@ var storeComponent = {
 			if(flags.content) $submit.addClass('able');
 			else $submit.removeClass('able');
 		}) 
+	},
+	/**
+	 * [buildMsgList 设置msg list]
+	 * @yansanmu github.com/yansm
+	 * @DateTime 2016-01-06T14:10:37+0800
+	 * @param    {[type]}                 $item    [description]
+	 * @param    {[type]}                 pManager [description]
+	 * @return   {[type]}                          [description]
+	 */
+	buildMsgList: function ($item, pManager){
+		feeds($item,{});
 	}
 }
 
 module.exports = storeComponent;  
-},{"plugin/menus":9,"store/messageStore":10,"zepto":22}],4:[function(require,module,exports){
+},{"plugin/feeds":6,"plugin/menus":10,"plugin/paging":11,"store/messageStore":12,"zepto":24}],4:[function(require,module,exports){
 var $ = require('zepto');
 var $ = require('zepto');
 var userStore = require('store/userStore');
@@ -1073,7 +1086,7 @@ var storeComponent = {
 }
 
 module.exports = storeComponent; 
-},{"store/userStore":11,"tool/ajax":12,"zepto":22}],5:[function(require,module,exports){
+},{"store/userStore":13,"tool/ajax":14,"zepto":24}],5:[function(require,module,exports){
 var $ = require('zepto'); 
 var pageContainer = require('view/viewContainer');
 
@@ -1572,6 +1585,9 @@ ModuleManager.prototype.setTimeout = function () {
 				});	
 			$content.css({	
 				'position': 'relative',
+			}).find('.container').css({
+				'-webkit-transform':'none',
+				'transform':'none',
 			});
 			$body.scrollTop(0);
 			me.flag = false;
@@ -1674,7 +1690,123 @@ module.exports = moduleManager;
 
 
 
-},{"plugin/menus":9,"view/viewContainer":21,"zepto":22}],6:[function(require,module,exports){
+},{"plugin/menus":10,"view/viewContainer":23,"zepto":24}],6:[function(require,module,exports){
+var $ = require('zepto');
+var messageStore = require('store/messageStore');
+var format = require('tool/format');
+var paging = require('plugin/paging');
+//var baguetteBox = require('plugin/baguetteBox');
+
+var $menu = $('#menu');
+
+ 
+var BuildFeeds = function (ele, options) {
+	this.ele = $(ele);
+	this.options = options;
+	this.options.type = this.ele.data('type') || 'list';
+	this[this.options.type]();
+}
+
+BuildFeeds.prototype.main = function () {
+	var me = this;
+	messageStore.listMsg({limit:3},function (e) {
+		if(typeof e ==='string'){
+			var data = JSON.parse(e), 
+				list = me.buildList(data,-1);
+			me.ele.prepend(list);
+		}else{
+			var data = e, 
+				list = me.buildList(data,-1);
+			me.ele.prepend(list);
+		}
+		
+	});
+	
+}
+
+BuildFeeds.prototype.list = function () {
+	var me = this, $item = me.ele;
+	
+	paging.buildScroll('cashlist', $item, function (page, doneFn) {
+		messageStore.listMsg({limit:5, stamp: page},function (e){
+				var data = e.data;
+					
+				var stamp = data.length?data[data.length-1].createTime : -1,
+					list = me.buildList(data, stamp);
+				
+				$item.data('page', stamp).find('.feeds-list').append(list);
+				doneFn && doneFn(!!~stamp);			
+		})
+	});
+	
+	var $toolBar = $('.toolbar');
+	
+	$item.on('loadingPaging', function () { 
+		$toolBar.addClass('loading');
+	}).on('loadedPaging', function () {
+		$toolBar.addClass('loading');
+	}).on('endPaging', function () {
+		$toolBar.removeClass('loading').addClass('end');
+	})
+	
+}
+
+BuildFeeds.prototype.buildList = function (data, stamp) { 
+	var html = [];
+	for(var i = 0,length = data.length; i < length; i ++) {
+		var item = data[i], 
+			content = item.content,
+			userHead = item.userHead,
+			userName = item.userName, 
+			nickName = item.nickName,
+			name = nickName?(nickName+'('+ userName +')'): userName,
+			time = format(new Date(+item.createTime), 'yyyy-MM-dd hh:mm');
+			
+		
+		html.push('<div class="feed-item"><div class="feed-head fix">');
+		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
+		html.push('</div>');
+		//	html.push(imgHtml);
+		html.push('<div class="fees-desc">'+ content +'</div>');
+		html.push('</div>');
+			 
+	}
+	return html.join('');
+}
+
+BuildFeeds.prototype.buildImgs = function (data, stamp) {
+	var length = data.length,  original = 'original', type = 'small', className = 'large'; 
+	if(length > 1 && length <5){ type = 'tiny'; className = 'small' } 
+	else if(length > 4){ type = 'tiny'; className = 'tiny'};
+	
+	var html = []; 
+	html.push('<ul class="fix feed-photos '+ className +'" data-stamp="'+ stamp +'">');
+	
+	for(var i = 0; i < length; i ++){
+		var img = data[i], photos = img.photos, url = decodeURIComponent(photos[type]) , originalUrl = decodeURIComponent(photos[original]), imgType = img.width > img.height ? 'wtype': 'htype'; 
+		html.push('<li oUrl='+ originalUrl +'><div class="feed-frame">&nbsp;<img class="'+ imgType +'" xSrc="'+ url +'" />&nbsp;</div></li>')
+	};
+	
+	html.push('</ul>');
+	
+	return html.join('');
+	
+}
+
+
+BuildFeeds.DEFAULTS = {};
+
+module.exports = function ($item, options) {
+	$item.each(function (item) {   
+		var $this = $(this)
+			,data    = $this.data('teemoFeeds')
+			,options = $.extend({}, BuildFeeds.DEFAULTS, typeof option == 'object' && option);
+		  
+		if (!data) $this.data('teemoFeeds', (data = new BuildFeeds(this, options)));
+		if (typeof option == 'string') data[option]();
+	});
+};  
+},{"plugin/paging":11,"store/messageStore":12,"tool/format":15,"zepto":24}],7:[function(require,module,exports){
 var $ = require('zepto');
 
 
@@ -1823,7 +1955,7 @@ var $ = require('zepto');
 	}
 	
 module.exports = null;
-},{"zepto":22}],7:[function(require,module,exports){
+},{"zepto":24}],8:[function(require,module,exports){
 
 
 /*!
@@ -1941,7 +2073,7 @@ module.exports = null;
 
 }));
 
-},{"zepto":22}],8:[function(require,module,exports){
+},{"zepto":24}],9:[function(require,module,exports){
 var flag = !!window.localStorage;
 
 module.exports = {
@@ -1955,7 +2087,7 @@ module.exports = {
 		flag && localStorage.removeItem(key);
 	}
 }; 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var $ = require('zepto');
 
 var $body = $('body');
@@ -2048,7 +2180,44 @@ var menusManager = {
  
 
 module.exports = menusManager;
-},{"zepto":22}],10:[function(require,module,exports){
+},{"zepto":24}],11:[function(require,module,exports){
+var $ = require('zepto');
+
+
+
+var paging = {
+	buildScroll: function (module, $item, callback) {	
+		
+		callback();
+		$(window).on('scroll.'+module, function () { 
+			if($item.data('isLoading')) return;
+			if(Math.abs($(window).scrollTop() - $(document).height() + $(window).height()) < 200){
+				var page = $item.data('page');
+				
+				if(~page){
+					$item.data('isLoading', true).trigger('loadingPaging');
+					callback(page, function (flag){
+						if(flag){
+							$item.data('isLoading', false).trigger('loadedPaging');
+						}else{
+							$item.trigger('endPaging');
+							paging.clearScroll(module);
+						}
+					});
+				}else{
+					$item.trigger('endPaging');
+					paging.clearScroll(module);
+				}
+			} 
+		})
+	} ,
+	clearScroll: function (module) {
+		$(window).off('scroll.'+module);
+	}
+} 
+
+module.exports = paging; 
+},{"zepto":24}],12:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -2062,11 +2231,18 @@ var storeManager = {
 			data:data
 		});
 	},
+	listMsg: function (data, callback) {
+		ajax({
+			url:'/message/list',
+			callback:callback,
+			data:data
+		});
+	}
 	
 } 
 
-module.exports = storeManager;
-},{"tool/ajax":12,"zepto":22}],11:[function(require,module,exports){
+module.exports = storeManager; 
+},{"tool/ajax":14,"zepto":24}],13:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -2111,7 +2287,7 @@ var storeManager = {
 } 
 
 module.exports = storeManager;
-},{"tool/ajax":12,"zepto":22}],12:[function(require,module,exports){
+},{"tool/ajax":14,"zepto":24}],14:[function(require,module,exports){
 var $ = require('zepto');
 
 module.exports = function (config) {
@@ -2129,224 +2305,30 @@ module.exports = function (config) {
 		}
 	});
 }  
-},{"zepto":22}],13:[function(require,module,exports){
+},{"zepto":24}],15:[function(require,module,exports){
+module.exports = function (date,fmt) { //author: meizz 
+    var o = {
+        "M+": date.getMonth() + 1, //月份 
+        "d+": date.getDate(), //日 
+        "h+": date.getHours(), //小时 
+        "m+": date.getMinutes(), //分 
+        "s+": date.getSeconds(), //秒 
+        "q+": Math.floor((date.getMonth() + 3) / 3), //季度 
+        "S": date.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+},{}],16:[function(require,module,exports){
 
 module.exports = function (url,key) {
 	var reg = new RegExp('(\\?|\\&)'+ key +'=([^\\&]+)')
 	var value = url.match(reg); 
 	return value&&value.length? value[2] : null;
 }
-},{}],14:[function(require,module,exports){
-/*
- * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
- * in FIPS PUB 180-1
- * Version 2.1a Copyright Paul Johnston 2000 - 2002.
- * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
- * Distributed under the BSD License
- * See http://pajhome.org.uk/crypt/md5 for details.
- */
-
-/*
- * Configurable variables. You may need to tweak these to be compatible with
- * the server-side, but the defaults work in most cases.
- */
-var hexcase = 0;  /* hex output format. 0 - lowercase; 1 - uppercase        */
-var b64pad  = ""; /* base-64 pad character. "=" for strict RFC compliance   */
-var chrsz   = 8;  /* bits per input character. 8 - ASCII; 16 - Unicode      */
-
-/*
- * These are the functions you'll usually want to call
- * They take string arguments and return either hex or base-64 encoded strings
- */
-function hex_sha1(s){return binb2hex(core_sha1(str2binb(s),s.length * chrsz));}
-function b64_sha1(s){return binb2b64(core_sha1(str2binb(s),s.length * chrsz));}
-function str_sha1(s){return binb2str(core_sha1(str2binb(s),s.length * chrsz));}
-function hex_hmac_sha1(key, data){ return binb2hex(core_hmac_sha1(key, data));}
-function b64_hmac_sha1(key, data){ return binb2b64(core_hmac_sha1(key, data));}
-function str_hmac_sha1(key, data){ return binb2str(core_hmac_sha1(key, data));}
-
-module.exports = {
-	hex_sha1: hex_sha1,
-	b64_sha1: b64_sha1,
-	str_sha1: str_sha1
-}
-
-/*
- * Perform a simple self-test to see if the VM is working
- */
-function sha1_vm_test()
-{
-  return hex_sha1("abc") == "a9993e364706816aba3e25717850c26c9cd0d89d";
-}
-
-/*
- * Calculate the SHA-1 of an array of big-endian words, and a bit length
- */
-function core_sha1(x, len)
-{
-  /* append padding */
-  x[len >> 5] |= 0x80 << (24 - len % 32);
-  x[((len + 64 >> 9) << 4) + 15] = len;
-
-  var w = Array(80);
-  var a =  1732584193;
-  var b = -271733879;
-  var c = -1732584194;
-  var d =  271733878;
-  var e = -1009589776;
-
-  for(var i = 0; i < x.length; i += 16)
-  {
-    var olda = a;
-    var oldb = b;
-    var oldc = c;
-    var oldd = d;
-    var olde = e;
-
-    for(var j = 0; j < 80; j++)
-    {
-      if(j < 16) w[j] = x[i + j];
-      else w[j] = rol(w[j-3] ^ w[j-8] ^ w[j-14] ^ w[j-16], 1);
-      var t = safe_add(safe_add(rol(a, 5), sha1_ft(j, b, c, d)),
-                       safe_add(safe_add(e, w[j]), sha1_kt(j)));
-      e = d;
-      d = c;
-      c = rol(b, 30);
-      b = a;
-      a = t;
-    }
-
-    a = safe_add(a, olda);
-    b = safe_add(b, oldb);
-    c = safe_add(c, oldc);
-    d = safe_add(d, oldd);
-    e = safe_add(e, olde);
-  }
-  return Array(a, b, c, d, e);
-
-}
-
-/*
- * Perform the appropriate triplet combination function for the current
- * iteration
- */
-function sha1_ft(t, b, c, d)
-{
-  if(t < 20) return (b & c) | ((~b) & d);
-  if(t < 40) return b ^ c ^ d;
-  if(t < 60) return (b & c) | (b & d) | (c & d);
-  return b ^ c ^ d;
-}
-
-/*
- * Determine the appropriate additive constant for the current iteration
- */
-function sha1_kt(t)
-{
-  return (t < 20) ?  1518500249 : (t < 40) ?  1859775393 :
-         (t < 60) ? -1894007588 : -899497514;
-}
-
-/*
- * Calculate the HMAC-SHA1 of a key and some data
- */
-function core_hmac_sha1(key, data)
-{
-  var bkey = str2binb(key);
-  if(bkey.length > 16) bkey = core_sha1(bkey, key.length * chrsz);
-
-  var ipad = Array(16), opad = Array(16);
-  for(var i = 0; i < 16; i++)
-  {
-    ipad[i] = bkey[i] ^ 0x36363636;
-    opad[i] = bkey[i] ^ 0x5C5C5C5C;
-  }
-
-  var hash = core_sha1(ipad.concat(str2binb(data)), 512 + data.length * chrsz);
-  return core_sha1(opad.concat(hash), 512 + 160);
-}
-
-/*
- * Add integers, wrapping at 2^32. This uses 16-bit operations internally
- * to work around bugs in some JS interpreters.
- */
-function safe_add(x, y)
-{
-  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
-  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-  return (msw << 16) | (lsw & 0xFFFF);
-}
-
-/*
- * Bitwise rotate a 32-bit number to the left.
- */
-function rol(num, cnt)
-{
-  return (num << cnt) | (num >>> (32 - cnt));
-}
-
-/*
- * Convert an 8-bit or 16-bit string to an array of big-endian words
- * In 8-bit function, characters >255 have their hi-byte silently ignored.
- */
-function str2binb(str)
-{
-  var bin = Array();
-  var mask = (1 << chrsz) - 1;
-  for(var i = 0; i < str.length * chrsz; i += chrsz)
-    bin[i>>5] |= (str.charCodeAt(i / chrsz) & mask) << (32 - chrsz - i%32);
-  return bin;
-}
-
-/*
- * Convert an array of big-endian words to a string
- */
-function binb2str(bin)
-{
-  var str = "";
-  var mask = (1 << chrsz) - 1;
-  for(var i = 0; i < bin.length * 32; i += chrsz)
-    str += String.fromCharCode((bin[i>>5] >>> (32 - chrsz - i%32)) & mask);
-  return str;
-}
-
-/*
- * Convert an array of big-endian words to a hex string.
- */
-function binb2hex(binarray)
-{
-  var hex_tab = hexcase ? "0123456789ABCDEF" : "0123456789abcdef";
-  var str = "";
-  for(var i = 0; i < binarray.length * 4; i++)
-  {
-    str += hex_tab.charAt((binarray[i>>2] >> ((3 - i%4)*8+4)) & 0xF) +
-           hex_tab.charAt((binarray[i>>2] >> ((3 - i%4)*8  )) & 0xF);
-  }
-  return str;
-}
-
-/*
- * Convert an array of big-endian words to a base-64 string
- */
-function binb2b64(binarray)
-{
-  var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  var str = "";
-  for(var i = 0; i < binarray.length * 4; i += 3)
-  {
-    var triplet = (((binarray[i   >> 2] >> 8 * (3 -  i   %4)) & 0xFF) << 16)
-                | (((binarray[i+1 >> 2] >> 8 * (3 - (i+1)%4)) & 0xFF) << 8 )
-                |  ((binarray[i+2 >> 2] >> 8 * (3 - (i+2)%4)) & 0xFF);
-    for(var j = 0; j < 4; j++)
-    {
-      if(i * 8 + j * 6 > binarray.length * 32) str += b64pad;
-      else str += tab.charAt((triplet >> 6*(3-j)) & 0x3F);
-    }
-  }
-  return str;
-}
-
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var $ = require('zepto');
 var messageComponent = require('component/messageComponent');
 
@@ -2380,7 +2362,7 @@ module.exports = {
 	buildPage: buildPage,
 	//needReload: true,
 } 
-},{"component/messageComponent":3,"zepto":22}],16:[function(require,module,exports){
+},{"component/messageComponent":3,"zepto":24}],18:[function(require,module,exports){
 var $ = require('zepto');
 
 var tpl = 
@@ -2437,7 +2419,7 @@ module.exports = {
 	hideMenu: 'auto',
 	errorList: errorList
 } 	
-},{"zepto":22}],17:[function(require,module,exports){
+},{"zepto":24}],19:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2480,7 +2462,7 @@ module.exports = {
 	buildPage: buildPage
 }
  
-},{"component/userComponent":4,"zepto":22}],18:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":24}],20:[function(require,module,exports){
 var $ = require('zepto');
 var messageComponent = require('component/messageComponent');
 
@@ -2490,6 +2472,11 @@ var tpl =
 			+'<div class="container no-padding">'
 				+'<div class="message-top"></div>'
 				+'<div class="message-add" data-toggle="next" data-target="addmsg"></div>'
+				+'<div class="message-list"  data-toggle="feeds" data-type="list"><div class="feeds-list"></div><div class="toolbar">'
+					+'<div class="toolbar-loaded"></div>'
+					+'<div class="toolbar-loading">更新中···</div>'
+					+'<div class="toolbar-end">到底了</div>'
+				+'</div></div>'
 			+'</div>' 
 		+'</section>'
 		
@@ -2500,6 +2487,7 @@ var showEvent;
 var buildPage = function($view, callback) {
 	var pageManager = this;
 	messageComponent.buildMsgTop($view.find('.message-top'), pageManager);
+	messageComponent.buildMsgList($view.find('.message-list'), pageManager);
 	callback && callback();
 } 
 
@@ -2510,7 +2498,7 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/messageComponent":3,"zepto":22}],19:[function(require,module,exports){
+},{"component/messageComponent":3,"zepto":24}],21:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2546,7 +2534,7 @@ module.exports = {
 	needReload: true
 } 
  
-},{"component/userComponent":4,"zepto":22}],20:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":24}],22:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -2591,7 +2579,7 @@ module.exports = {
 	needReload: true
 } 
  
-},{"component/userComponent":4,"zepto":22}],21:[function(require,module,exports){
+},{"component/userComponent":4,"zepto":24}],23:[function(require,module,exports){
 var pages = {};
 
 pages.regstu = require('./regStuView');
@@ -2612,7 +2600,7 @@ module.exports = {
 		return pages[page]|| null;
 	}
 } 
-},{"./addMsgView":15,"./errorView":16,"./mainView":17,"./messageView":18,"./regStuView":19,"./regUserView":20}],22:[function(require,module,exports){
+},{"./addMsgView":17,"./errorView":18,"./mainView":19,"./messageView":20,"./regStuView":21,"./regUserView":22}],24:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/

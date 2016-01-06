@@ -37,7 +37,8 @@ module.exports = function(options, onResult)
     });
 
     req.on('error', function(err) {
-        res.send('error: ' + err.message);
+        console.log('error: ' + err.message);
+        onResult(-1, {msg: err.message});
     });
 
     req.end();

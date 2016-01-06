@@ -1,6 +1,9 @@
 var $ = require('zepto');
 var menus = require('plugin/menus')
 var messageStore = require('store/messageStore');
+var feeds = require('plugin/feeds');
+
+var paging = require('plugin/paging');
 
 var storeComponent = {
 	/**
@@ -47,6 +50,17 @@ var storeComponent = {
 			if(flags.content) $submit.addClass('able');
 			else $submit.removeClass('able');
 		}) 
+	},
+	/**
+	 * [buildMsgList 设置msg list]
+	 * @yansanmu github.com/yansm
+	 * @DateTime 2016-01-06T14:10:37+0800
+	 * @param    {[type]}                 $item    [description]
+	 * @param    {[type]}                 pManager [description]
+	 * @return   {[type]}                          [description]
+	 */
+	buildMsgList: function ($item, pManager){
+		feeds($item,{});
 	}
 }
 

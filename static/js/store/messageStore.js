@@ -11,7 +11,14 @@ var storeManager = {
 			data:data
 		});
 	},
+	listMsg: function (data, callback) {
+		ajax({
+			url:'/message/list',
+			callback:callback,
+			data:data
+		});
+	}
 	
 } 
 
-module.exports = storeManager;
+module.exports = storeManager; 

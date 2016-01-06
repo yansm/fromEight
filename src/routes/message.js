@@ -9,7 +9,7 @@ var errConfig = reqlib('config/errcode-config');
 var objectAssign = require('object-assign');
 
 /**
- * [添加用户]
+ * [添加messages]
  * @yansanmu github.com/yansm
  * @DateTime 2015-12-30T21:26:58+0800
  * @param    {[type]}                 req         [description]
@@ -33,6 +33,24 @@ router.post('/add',function(req, res, next){
 	});
 });
 
+/**
+ * [message列表]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-06T11:18:04+0800
+ * @param    {[type]}                 req              [description]
+ * @param    {[type]}                 res              [description]
+ * @param    {[type]}                 next){	var      data                [description]
+ * @param    {[type]}                 errConfig[9000]) );		return;	}	data [description]
+ * @return   {[type]}                                  [description]
+ */
+router.post('/list',function(req, res, next){
+	var data = req.body;
+
+	data = objectAssign({}, data);
+	messageService.list(data,function (uRes) {
+		res.json(uRes);
+	});
+});
 
 module.exports = router;
 	
