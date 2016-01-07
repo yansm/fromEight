@@ -1,0 +1,74 @@
+.article-add{
+	background: #fff url(../images/write.png) center center no-repeat;
+}  
+
+.article-list{
+	padding-top: 120px;
+	.feed-item{padding: 0;margin-bottom: 26px;padding-bottom: 40px;}
+	.feed-title{
+		padding: 10px 0;
+	    font-size: 1.4em;
+	    text-align: left;
+	}
+	.feed-name,.feed-time{
+		display: inline-block; font-size: 1em; margin-left: 15px; 
+	}
+	.feed-time{
+		float: right;line-height: 68px;
+	}
+	.feed-head {
+		text-align: left; padding: 18px 47px;
+		.l{float: none; display: inline;}
+		img{
+			float: none; display: inline-block;vertical-align: middle;
+			margin: 0;
+		}
+	}
+}
+.feed-art{
+	padding: 40px 56px; background: @baseColor2; color:@baseBg;
+}
+
+.article-box{
+	padding: 0 36px;
+    color: #333;
+    text-shadow: 0 0 2px;
+}
+
+.article-top{
+	margin-bottom: 20px;
+	h2{
+		text-align: center;
+	    font-weight: 100;
+	    padding: 80px 0 12px;
+	    border-bottom: 2px solid @baseColor;
+	    font-size:2em;
+	}
+	aside{
+		text-align: right; letter-spacing: 0px;
+	    color: #999;
+	    padding-top: 8px;
+	    text-shadow: none;
+	    font-size:.8em;
+	    .author{
+	    	&:before{
+	    		content:'作者：';
+	    	}
+	    }
+	    .time{
+	    	&:before{
+	    		content: '创建于：'; margin-left: 20px;
+	    	}
+	    }
+	}
+}
+.article-content{
+	line-height: 1.6; letter-spacing: 4px;
+	&:first-letter{
+		font-size:2em; color:@baseColor;
+	}
+	p{
+		text-indent: 2em; 
+		margin-bottom: 12px;
+	}
+}

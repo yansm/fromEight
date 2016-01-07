@@ -37,7 +37,7 @@ router.post('/add',function(req, res, next){
 			flags.push(1);
 			if(flags.length === length){
 				if(paths.length === length){
-					data = objectAssign({}, data, {images:paths.join(','),author: openId, createTime: createTime, status: 1});
+					data = objectAssign({}, data, {images:JSON.stringify(paths),author: openId, createTime: createTime, status: 1});
 					messageService.add(data,function (uRes) {
 						res.json(uRes);
 					});

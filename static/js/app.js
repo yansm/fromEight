@@ -10,6 +10,8 @@ var ajax = require('tool/ajax');
 
 require('plugin/form');
 
+var scrollLoading = require('plugin/scrollLoading')
+
 
 var getUrlVar = require('tool/getUrlVar'); 
  
@@ -71,6 +73,7 @@ var uploadImageFn = function (localIds, callback) {
 					var $this = $(this),serverIds = $this.data('serverIds')||[]; count = serverIds.length, $parent = $this.parent();
 					if(count >= 9) {
 						pageManager.showErr('最大可上传9张');
+						return;
 					}
 					wx.chooseImage({
 						count: 9-count, // 默认9
@@ -125,7 +128,7 @@ $(function () {
 			} 
 		}else{
 
-			pageManager.init($('body'),'addmsg'); 
+			pageManager.init($('body'),'article'); 
 			pageManager.buildMenu({nickName:'三木',userName:'闫三木',stuNum:'20093514',userHead: '../images/welcome1.jpg'});
 		}
 	});
@@ -149,7 +152,10 @@ $(function () {
 			var $this = $(this), target = $this.data('target'); 
 			pageManager.fadein(target);
 		})
-		
-	
+		.on('click', '[data-toggle="toArticle"]', function (e) {
+			var $this = $(this), id = $this.data('id');
+			pageManager.next('detailart',{id:id});
+		})
+	scrollLoading();
 
 }); 

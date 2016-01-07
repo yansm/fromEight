@@ -4,6 +4,8 @@ var weixinConfig = reqlib('config/weixin-config');
 var http = require("http");
 var fs = require("fs");
 
+var sizeOf = require('image-size');
+
 var getJson = reqlib('src/plugins/getjson');
 
 var service = {
@@ -117,14 +119,18 @@ var service = {
 		  });
 		  res.on('end', function(){
 		        var data = Buffer.concat(chunks, size);
+		        var dimensions = sizeOf(data);
 		        var pathName = '/media/'+fileName;
 		        fs.writeFile('public'+pathName, data, function (err) {
 				    if (err) {
-				    	throw err ;
+				    	console.log('Error '+ err.message);
 				    	callback && callback(false);
-				    }
-				    else{
-				    	callback && callback(pathName);
+				    }else{
+				    	callback && callback({
+				    		path: pathName,
+				    		width: dimensions.width,
+				    		height: dimensions.height
+				    	});
 				    	console.log('File '+ fileName +' Saved !'); //文件被保存
 				    }
 				    

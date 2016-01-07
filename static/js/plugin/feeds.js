@@ -6,7 +6,9 @@ var paging = require('plugin/paging');
 
 var $menu = $('#menu');
 
- 
+var baguetteBox = require('plugin/baguetteBox');
+baguetteBox();
+
 var BuildFeeds = function (ele, options) {
 	this.ele = $(ele);
 	this.options = options;
@@ -37,9 +39,9 @@ BuildFeeds.prototype.removeScroll = function (){
 
 BuildFeeds.prototype.list = function () {
 	var me = this, $item = me.ele;
-	
+	var listFn = this.options.listFn || messageStore.listMsg;
 	paging.buildScroll('cashlist', $item, function (page, doneFn) {
-		messageStore.listMsg({limit:5, stamp: page},function (e){
+		listFn({limit:5, stamp: page},function (e){
 				var data = e.data;
 					
 				var stamp = data.length?data[data.length-1].createTime : -1,
@@ -66,20 +68,25 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 	var html = [];
 	for(var i = 0,length = data.length; i < length; i ++) {
 		var item = data[i], 
-			content = item.content,
+			content = item.content || '',
+			title  = item.title || '',
+			contentDesc = item.contentDesc || '',
 			userHead = item.userHead,
 			userName = item.userName, 
 			nickName = item.nickName,
+			id = item.id,
 			name = nickName?(nickName+'('+ userName +')'): userName,
 			time = format(new Date(+item.createTime), 'yyyy-MM-dd hh:mm'),
-			imgHtml = this.buildImgs(item.images && item.images.split(','));
+			imgHtml = this.buildImgs(item.images && JSON.parse(item.images));
 			
 		
-		html.push('<div class="feed-item"><div class="feed-head fix">');
+		html.push('<div class="feed-item" data-toggle="toArticle" data-id='+id+'>');
+		html.push('<div class="feed-head fix">');
 		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
 		html.push('</div>');
 		html.push(imgHtml);
-		html.push('<div class="fees-desc">'+ content +'</div>');
+		title&& html.push('<div class="feed-art"><div class="feed-title">'+ title +'</div><aside>'+ contentDesc +'</aside></div>');
+		content && html.push('<div class="fees-desc">'+ content +'</div>');
 		html.push('</div>');
 			 
 	}
@@ -87,7 +94,6 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 } 
  
 BuildFeeds.prototype.buildImgs = function (data) {
-	console.log(data);
 	if(!data || !data.length) return '';
 	var length = data.length,  original = 'original', type = 'small', className = 'large'; 
 	if(length > 1 && length <5){ type = 'tiny'; className = 'small' } 
@@ -97,8 +103,8 @@ BuildFeeds.prototype.buildImgs = function (data) {
 	html.push('<ul class="fix feed-photos '+ className +'" >');
 	
 	for(var i = 0; i < length; i ++){
-		var img = data[i], url = img , originalUrl = img, imgType = 'wtype';//img.width > img.height ? 'wtype': 'htype'; 
-		html.push('<li oUrl='+ originalUrl +'><div class="feed-frame">&nbsp;<img style="opacity:1" class="'+ imgType +'" src="'+ url +'" />&nbsp;</div></li>')
+		var img = data[i], url = img.path , originalUrl = img.path, imgType = img.width > img.height ? 'wtype': 'htype'; 
+		html.push('<li oUrl='+ originalUrl +'><div class="feed-frame">&nbsp;<img  class="'+ imgType +'" xsrc="'+ url +'" />&nbsp;</div></li>')
 	};
 	
 	html.push('</ul>');

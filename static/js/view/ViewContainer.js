@@ -12,6 +12,9 @@ pages.main = require('./mainView');
 pages.message = require('./messageView');
 pages.addmsg = require('./addMsgView');
 
+pages.article = require('./articleView');
+pages.addart = require('./addArtView');
+pages.detailart = require('./detailArtView')
 
 module.exports = {
 	get: function (page) { 

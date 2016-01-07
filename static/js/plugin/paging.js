@@ -6,7 +6,7 @@ var paging = {
 	buildScroll: function (module, $item, callback) {	
 		
 		callback();
-		$(window).on('scroll.'+module, function () { console.log(123);
+		$(window).on('scroll.'+module, function () { 
 			if($item.data('isLoading')) return;
 			if(Math.abs($(window).scrollTop() - $(document).height() + $(window).height()) < 200){
 				var page = $item.data('page');

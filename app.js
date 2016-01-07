@@ -12,6 +12,7 @@ var routes = reqlib('src/routes/index');
 var users = reqlib('src/routes/users');
 var weixin = reqlib('src/routes/weixin');
 var message = reqlib('src/routes/message');
+var article = reqlib('src/routes/article');
 
 
 
@@ -34,6 +35,7 @@ app.use('/', routes);
 app.use('/user', users);
 app.use('/weixin', weixin);
 app.use('/message', message);
+app.use('/article', article);
 
 app.use(require('connect-livereload')());
 
