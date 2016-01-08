@@ -8,6 +8,7 @@ var tpl =
 				+'<div class="article-box">'
 					+'<div class="article-top"><h2 data-target="title"></h2><aside><span class="author" data-target="author"></span><span class="time" data-target="time"></span></aside></div>'
 					+'<div class="article-content" data-target="content"></div>'
+					+'<div class="article-bar fix"></div>'
 				+'</div>'
 			+'</div>' 
 		+'</section>'

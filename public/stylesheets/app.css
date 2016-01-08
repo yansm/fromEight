@@ -2082,6 +2082,18 @@ button.swiper-pagination-bullet {
   text-indent: 2em;
   margin-bottom: 12px;
 }
+.article-bar {
+  margin: 20px 0;
+  border-bottom: #d5d5d5;
+}
+.article-btn {
+  float: right;
+  padding: 10px 20px;
+  color: #ccc;
+}
+.article-btn:active {
+  background: #efefef;
+}
 /**
  * 动画效果
  */

@@ -33,7 +33,7 @@ module.exports = {
 		userName:'刘小云',
 		nickName:'小云',
 	},20093505: {
-		userName:'刘祝恒',
+		userName:'刘竹恒',
 		nickName:'猪',
 	},20093506: {
 		userName:'吕成',

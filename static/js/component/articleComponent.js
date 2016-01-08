@@ -63,7 +63,16 @@ var storeComponent = {
 				$item.find('[data-target="time"]').html(createTime);
 				$item.find('[data-target="author"]').html(name);
 				$item.find('[data-target="content"]').html(content);
-
+				if(!canWrite){
+					(function (data) {
+						$('<div class="article-btn" data-toggle="updateArticle">编辑</div>').
+							on('click', function () {
+								
+							}).appendTo($item.find('.article-bar'));
+					})(data)
+					
+				}
+				 
 			}
 			
 		});

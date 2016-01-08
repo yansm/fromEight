@@ -1069,7 +1069,16 @@ var storeComponent = {
 				$item.find('[data-target="time"]').html(createTime);
 				$item.find('[data-target="author"]').html(name);
 				$item.find('[data-target="content"]').html(content);
-
+				if(!canWrite){
+					(function (data) {
+						$('<div class="article-btn" data-toggle="updateArticle">编辑</div>').
+							on('click', function () {
+								
+							}).appendTo($item.find('.article-bar'));
+					})(data)
+					
+				}
+				 
 			}
 			
 		});
@@ -6983,6 +6992,7 @@ var tpl =
 				+'<div class="article-box">'
 					+'<div class="article-top"><h2 data-target="title"></h2><aside><span class="author" data-target="author"></span><span class="time" data-target="time"></span></aside></div>'
 					+'<div class="article-content" data-target="content"></div>'
+					+'<div class="article-bar fix"></div>'
 				+'</div>'
 			+'</div>' 
 		+'</section>'
