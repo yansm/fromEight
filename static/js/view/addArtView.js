@@ -2,7 +2,7 @@ var $ = require('zepto');
 var articleComponent = require('component/articleComponent');
 
 var tpl = 
-	'<header class="addart-head" id="addart-head"><div class="left-icon back-icon" data-toggle="prev" data-target="article"></div></header>'
+	'<header class="addart-head" id="addart-head"><div class="left-icon back-icon" ></div></header>'
 		+'<section class="addart-area" id="addart-area">'
 			+'<div class="container no-padding">'
 				+'<div id="addArtForm" class="msg-form" role="form">'
@@ -24,9 +24,17 @@ var hiddenEvent;
 
 var showEvent;
  
-var buildPage = function($view, callback) {
+var buildPage = function($view, callback, config) {
 	var pageManager = this; 
-	articleComponent.buildAddForm($view.find('#addArtForm'), pageManager);
+		$view.find('.back-icon').on('click',function (){
+			if(config){
+				pageManager.prev('detailart', config);
+			}else{
+				pageManager.prev('article');
+			}
+		})
+
+	articleComponent.buildAddForm($view.find('#addArtForm'), pageManager, config);
 	callback && callback();
 } 
 

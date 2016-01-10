@@ -12,6 +12,17 @@ module.exports = {
 		articleDao.add(data, callback);
 	},
 	/**
+	 * [update description]
+	 * yansanmu 
+	 * @DateTime 2016-01-10T13:55:10+0800
+	 * @param    {[type]}                 data     [description]
+	 * @param    {Function}               callback [description]
+	 * @return   {[type]}                          [description]
+	 */
+	update: function (data, callback) {
+		articleDao.update(data, callback);
+	},
+	/**
 	 * [list description]
 	 * @yansanmu github.com/yansm
 	 * @DateTime 2016-01-07T17:20:23+0800

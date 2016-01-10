@@ -80,7 +80,7 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 			imgHtml = this.buildImgs(item.images && JSON.parse(item.images));
 			
 		
-		html.push('<div class="feed-item" data-toggle="toArticle" data-id='+id+'>');
+		html.push('<div class="feed-item" data-toggle="'+ (title?'toArticle':'toMessage') +'" data-id='+id+'>');
 		html.push('<div class="feed-head fix">');
 		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
 		html.push('</div>');

@@ -1021,7 +1021,14 @@ var storeComponent = {
 	 * @param    {[type]}                 pManager [description]
 	 * @return   {[type]}                          [description]
 	 */
-	buildAddForm: function($item, pManager){
+	buildAddForm: function($item, pManager,config){
+
+		if(config){
+			$item.find('[name="id"]').val(config.id);
+			$item.find('[name="title"]').val(config.title);
+			$item.find('[name="content"]').val(config.content);
+		}
+
 		$item.formValidate(); 
 		var $submit = $item.find('[data-toggle=submit]');
 		$item.on('click', '[data-toggle="submit"]', function () {
@@ -1029,6 +1036,8 @@ var storeComponent = {
 				if(!flag) return;
 				$item.formValidate('submit', function (data) { 
 					//alert(JSON.stringify(data));
+					if(!config) data.type="add";
+					else data.type="update";
 					articleStore.addArt(data, function (e) {
 						//alert(e.data.content.replace(/(.+)/g, '<p>$1</p>'));
 						if(e.code){
@@ -1069,11 +1078,11 @@ var storeComponent = {
 				$item.find('[data-target="time"]').html(createTime);
 				$item.find('[data-target="author"]').html(name);
 				$item.find('[data-target="content"]').html(content);
-				if(!canWrite){
+				if(canWrite){
 					(function (data) {
 						$('<div class="article-btn" data-toggle="updateArticle">编辑</div>').
 							on('click', function () {
-								
+								pManager.next('addart',data);
 							}).appendTo($item.find('.article-bar'));
 					})(data)
 					
@@ -1986,7 +1995,7 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 			imgHtml = this.buildImgs(item.images && JSON.parse(item.images));
 			
 		
-		html.push('<div class="feed-item" data-toggle="toArticle" data-id='+id+'>');
+		html.push('<div class="feed-item" data-toggle="'+ (title?'toArticle':'toMessage') +'" data-id='+id+'>');
 		html.push('<div class="feed-head fix">');
 		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
 		html.push('</div>');
@@ -6872,7 +6881,7 @@ var $ = require('zepto');
 var articleComponent = require('component/articleComponent');
 
 var tpl = 
-	'<header class="addart-head" id="addart-head"><div class="left-icon back-icon" data-toggle="prev" data-target="article"></div></header>'
+	'<header class="addart-head" id="addart-head"><div class="left-icon back-icon" ></div></header>'
 		+'<section class="addart-area" id="addart-area">'
 			+'<div class="container no-padding">'
 				+'<div id="addArtForm" class="msg-form" role="form">'
@@ -6894,9 +6903,17 @@ var hiddenEvent;
 
 var showEvent;
  
-var buildPage = function($view, callback) {
+var buildPage = function($view, callback, config) {
 	var pageManager = this; 
-	articleComponent.buildAddForm($view.find('#addArtForm'), pageManager);
+		$view.find('.back-icon').on('click',function (){
+			if(config){
+				pageManager.prev('detailart', config);
+			}else{
+				pageManager.prev('article');
+			}
+		})
+
+	articleComponent.buildAddForm($view.find('#addArtForm'), pageManager, config);
 	callback && callback();
 } 
 

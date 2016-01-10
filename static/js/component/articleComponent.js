@@ -15,7 +15,14 @@ var storeComponent = {
 	 * @param    {[type]}                 pManager [description]
 	 * @return   {[type]}                          [description]
 	 */
-	buildAddForm: function($item, pManager){
+	buildAddForm: function($item, pManager,config){
+
+		if(config){
+			$item.find('[name="id"]').val(config.id);
+			$item.find('[name="title"]').val(config.title);
+			$item.find('[name="content"]').val(config.content);
+		}
+
 		$item.formValidate(); 
 		var $submit = $item.find('[data-toggle=submit]');
 		$item.on('click', '[data-toggle="submit"]', function () {
@@ -23,6 +30,8 @@ var storeComponent = {
 				if(!flag) return;
 				$item.formValidate('submit', function (data) { 
 					//alert(JSON.stringify(data));
+					if(!config) data.type="add";
+					else data.type="update";
 					articleStore.addArt(data, function (e) {
 						//alert(e.data.content.replace(/(.+)/g, '<p>$1</p>'));
 						if(e.code){
@@ -63,11 +72,11 @@ var storeComponent = {
 				$item.find('[data-target="time"]').html(createTime);
 				$item.find('[data-target="author"]').html(name);
 				$item.find('[data-target="content"]').html(content);
-				if(!canWrite){
+				if(canWrite){
 					(function (data) {
 						$('<div class="article-btn" data-toggle="updateArticle">编辑</div>').
 							on('click', function () {
-								
+								pManager.next('addart',data);
 							}).appendTo($item.find('.article-bar'));
 					})(data)
 					

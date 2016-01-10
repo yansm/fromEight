@@ -21,7 +21,7 @@ module.exports = {
 		var res = objectAssign({}, errcodeConfig[0]);
 		pool.getConnection(function(err, connection) {
 			var sql = 'INSERT INTO c8_message(content, author, create_time, images, status ) VALUES(?,?,?,?,?)'
-				,data = [bean.content, ''+bean.author, bean.createTime, bean.images, bean.status];
+				,data = [bean.content, ''+bean.author, bean.createTime, bean.images||'', bean.status];
 	  		connection.query(sql, data, function(err, result) {
 	        	if(!result) res = objectAssign({}, errcodeConfig[1001]); 
 	        	callback&& callback(objectAssign({},res,{data:bean})); 

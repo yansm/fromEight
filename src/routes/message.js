@@ -27,24 +27,31 @@ router.post('/add',function(req, res, next){
 		res.json( objectAssign({}, errConfig[9000]) );
 		return;
 	}
-	var images = data.images.split(','), length = images.length, paths = [], flags = [];
-	for(var i = 0; i < length; i ++) {
-		var mediaId = images[i];
-		weixinService.getMedia(global.myConfig.accessToken, mediaId, function(path){
-			if(path){
-				paths.push(path);
-			}
-			flags.push(1);
-			if(flags.length === length){
-				if(paths.length === length){
-					data = objectAssign({}, data, {images:JSON.stringify(paths),author: openId, createTime: createTime, status: 1});
-					messageService.add(data,function (uRes) {
-						res.json(uRes);
-					});
-				}else{
-					res.json(objectAssign({},errConfig[3001]));
+	if(data.images){
+		var images = data.images.split(','), length = images.length, paths = [], flags = [];
+		for(var i = 0; i < length; i ++) {
+			var mediaId = images[i];
+			weixinService.getMedia(global.myConfig.accessToken, mediaId, function(path){
+				if(path){
+					paths.push(path);
 				}
-			}
+				flags.push(1);
+				if(flags.length === length){
+					if(paths.length === length){
+						data = objectAssign({}, data, {images:JSON.stringify(paths),author: openId, createTime: createTime, status: 1});
+						messageService.add(data,function (uRes) {
+							res.json(uRes);
+						});
+					}else{
+						res.json(objectAssign({},errConfig[3001]));
+					}
+				}
+			});
+		}
+	}else{
+		data = objectAssign({}, data, {author: openId, createTime: createTime, status: 1});
+		messageService.add(data,function (uRes) {
+			res.json(uRes);
 		});
 	}
 	

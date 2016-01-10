@@ -33,6 +33,28 @@ module.exports = {
 	    });
 	},
 	/**
+	 * [update 更改文章]
+	 * yansanmu 
+	 * @DateTime 2016-01-10T13:55:27+0800
+	 * @param    {[type]}                 bean     [description]
+	 * @param    {Function}               callback [description]
+	 * @return   {[type]}                          [description]
+	 */
+	update: function (bean, callback){
+		var res = objectAssign({}, errcodeConfig[0]);
+		pool.getConnection(function(err, connection) {
+			var sql = 'UPDATE c8_article SET ? WHERE id=?'
+				,data = {title: bean.title, content: bean.content, update_time: bean.updateTime};
+	  		connection.query(sql, [data, +bean.id], function(err, result) {
+	        	if(!result) res = objectAssign({}, errcodeConfig[1001]); 
+	        	bean.canWrite = 1;
+	        	callback&& callback(objectAssign({},res,{data:bean})); 
+		        // 释放连接 
+		        connection.release();
+	    	});
+	    });
+	},
+	/**
 	 * [list 文章列表]
 	 * @yansanmu github.com/yansm
 	 * @DateTime 2016-01-07T17:13:08+0800

@@ -22,11 +22,18 @@ router.post('/add',function(req, res, next){
 		res.json( objectAssign({}, errConfig[9000]) );
 		return;
 	}
-
-	data = objectAssign({}, data, {author: openId, createTime: createTime, status: 1});
-	articleService.add(data,function (uRes) {
-		res.json(uRes);
-	});
+	data = objectAssign({}, data, {author: openId, createTime: createTime,updateTime: createTime, status: 1});
+	if(data.type==='add'){
+		articleService.add(data,function (uRes) {
+			res.json(uRes);
+		});
+	}else{
+		articleService.update(data,function (uRes){
+			res.json(uRes);
+		})
+	}
+	
+	
 });
 
 /**
