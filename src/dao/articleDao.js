@@ -67,12 +67,15 @@ module.exports = {
 		pool.getConnection(function(err, connection) {
 			var stamp = bean.stamp|| new Date().getTime(), limit = bean.limit || 10;
 			var sql = 'select u.nick_name as nickName, u.user_head as userHead, u.user_name as userName,'
-				+' m.create_time as createTime, m.title as title, m.update_time as updateTime, m.id as id, m.author=? as canWrite, left(m.content, 60) as contentDesc '
-				+' from c8_user u,c8_article m where u.open_id = m.author and m.status = 1 and  m.create_time < ? order by m.create_time desc limit 0,?';
+				+' m.create_time as createTime, m.title as title, m.update_time as updateTime, m.id as id, m.author=? as canWrite, left(m.content, 60) as contentDesc , count(c.id) as comCount '
+				+' from c8_user u,c8_article m  left join c8_comment c on m.id = c.parent_id and c.type="art" where u.open_id = m.author and m.status = 1 and  m.create_time < ? GROUP BY m.id order by m.create_time desc limit 0,? ';
 	  		connection.query(sql,[''+bean.openId, ''+stamp, +limit], function(err, result) {
 	  			if(err) console.log('error: '+err);
 	        	if(!result || !result.length) res = objectAssign(res,{data: []});
-	        	else res = objectAssign(res,{data:result});
+	        	else {
+	        		if(!result[0].id) res = objectAssign(res,{data: []});
+	        		else res = objectAssign(res,{data:result});
+	        	}
 	        	callback&& callback(res); 
 		        // 释放连接 
 		        connection.release(); 

@@ -26,13 +26,13 @@ var showEvent;
  
 var buildPage = function($view, callback, config) {
 	var pageManager = this; 
-		$view.find('.back-icon').on('click',function (){
-			if(config){
-				pageManager.prev('detailart', config);
-			}else{
-				pageManager.prev('article');
-			}
-		})
+	$view.find('.back-icon').on('click',function (){
+		if(config){
+			pageManager.prev('detailart', config);
+		}else{
+			pageManager.prev('article');
+		}
+	})
 
 	articleComponent.buildAddForm($view.find('#addArtForm'), pageManager, config);
 	callback && callback();

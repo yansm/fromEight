@@ -72,12 +72,15 @@ var storeComponent = {
 				$item.find('[data-target="time"]').html(createTime);
 				$item.find('[data-target="author"]').html(name);
 				$item.find('[data-target="content"]').html(content);
+				$('<div class="article-btn" data-toggle="commentArticle" data-id="'+ id +'" data-type="art">回复</div>')
+					.appendTo($item.find('.article-bar'));
 				if(canWrite){
 					(function (data) {
 						$('<div class="article-btn" data-toggle="updateArticle">编辑</div>').
 							on('click', function () {
 								pManager.next('addart',data);
 							}).appendTo($item.find('.article-bar'));
+
 					})(data)
 					
 				}

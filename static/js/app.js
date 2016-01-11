@@ -156,6 +156,11 @@ $(function () {
 			var $this = $(this), id = $this.data('id');
 			pageManager.next('detailart',{id:id});
 		})
+		.on('click', '[data-toggle="commentArticle"]', function (e) {
+			var $this = $(this), data = $this.data();
+			pageManager.next('addcom',data);
+
+		})
 	scrollLoading();
 
 }); 

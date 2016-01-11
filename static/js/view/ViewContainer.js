@@ -16,6 +16,8 @@ pages.article = require('./articleView');
 pages.addart = require('./addArtView');
 pages.detailart = require('./detailArtView')
 
+pages.addcom = require('./addComView');
+
 module.exports = {
 	get: function (page) { 
 		return pages[page]|| null;

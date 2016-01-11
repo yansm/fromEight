@@ -4,7 +4,7 @@
 
 .article-list{
 	padding-top: 120px;
-	.feed-item{padding: 0;margin-bottom: 26px;padding-bottom: 40px;}
+	.feed-item{padding: 0;margin-bottom: 26px;}
 	.feed-title{
 		padding: 10px 0;
 	    font-size: 1.4em;
@@ -27,6 +27,13 @@
 }
 .feed-art{
 	padding: 40px 56px; background: @baseColor2; color:@baseBg;
+}
+
+.feed-bar{
+	padding: 20px; text-align: right;
+}
+.feed-bar-item{
+	display: inline-block;padding: 0 20px;
 }
 
 .article-box{
@@ -80,5 +87,12 @@
 	border-top:2px solid #d5d5d5;
 	&:active{
 		background: #ccc;
+	}
+}
+
+.comment-box{
+	position: fixed; bottom:0; left:0; right: 0; height: 100px;
+	.form{
+		margin-top: 0;padding: 0;
 	}
 }

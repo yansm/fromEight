@@ -1000,10 +1000,15 @@ $(function () {
 			var $this = $(this), id = $this.data('id');
 			pageManager.next('detailart',{id:id});
 		})
+		.on('click', '[data-toggle="commentArticle"]', function (e) {
+			var $this = $(this), data = $this.data();
+			pageManager.next('addcom',data);
+
+		})
 	scrollLoading();
 
 }); 
-},{"fastclick":1,"manager/pageManager":6,"plugin/form":9,"plugin/jquery.cookie":10,"plugin/localStorageManager":11,"plugin/scrollLoading":14,"store/userStore":18,"tool/ajax":19,"tool/getUrlVar":21,"zepto":32}],3:[function(require,module,exports){
+},{"fastclick":1,"manager/pageManager":7,"plugin/form":10,"plugin/jquery.cookie":11,"plugin/localStorageManager":12,"plugin/scrollLoading":15,"store/userStore":20,"tool/ajax":21,"tool/getUrlVar":23,"zepto":35}],3:[function(require,module,exports){
 var $ = require('zepto');
 var menus = require('plugin/menus')
 var articleStore = require('store/articleStore');
@@ -1078,12 +1083,15 @@ var storeComponent = {
 				$item.find('[data-target="time"]').html(createTime);
 				$item.find('[data-target="author"]').html(name);
 				$item.find('[data-target="content"]').html(content);
+				$('<div class="article-btn" data-toggle="commentArticle" data-id="'+ id +'" data-type="art">回复</div>')
+					.appendTo($item.find('.article-bar'));
 				if(canWrite){
 					(function (data) {
 						$('<div class="article-btn" data-toggle="updateArticle">编辑</div>').
 							on('click', function () {
 								pManager.next('addart',data);
 							}).appendTo($item.find('.article-bar'));
+
 					})(data)
 					
 				}
@@ -1096,7 +1104,59 @@ var storeComponent = {
 }
 
 module.exports = storeComponent;  
-},{"plugin/feeds":8,"plugin/menus":12,"plugin/paging":13,"store/articleStore":16,"tool/format":20,"zepto":32}],4:[function(require,module,exports){
+},{"plugin/feeds":9,"plugin/menus":13,"plugin/paging":14,"store/articleStore":17,"tool/format":22,"zepto":35}],4:[function(require,module,exports){
+var $ = require('zepto');
+
+var commentStore = require('store/commentStore');
+
+
+var format = require('tool/format');
+
+var storeComponent = {
+	/**
+	 * [buildAddForm description]
+	 * yansanmu 
+	 * @DateTime 2016-01-11T23:47:11+0800
+	 * @param    {[type]}                 $item    [description]
+	 * @param    {[type]}                 pManager [description]
+	 * @param    {[type]}                 config   [description]
+	 * @return   {[type]}                          [description]
+	 */
+	buildAddForm: function($item, pManager,config){
+		//console.log(config);
+		$item.find('[name="parentId"]').val(config.id||'');
+		$item.find('[name="type"]').val(config.type||'');
+		$item.find('[name="reId"]').val(config.reid||''); 
+
+		$item.formValidate(); 
+		var $submit = $item.find('[data-toggle=submit]');
+		$item.on('click', '[data-toggle="submit"]', function () {
+			$item.formValidate('checkForm', function (flag){  
+				if(!flag) return;
+				$item.formValidate('submit', function (data) { 
+					//alert(JSON.stringify(data));
+					commentStore.addCom(data, function (e) {
+						if(e.code){
+							pManager.showErr(e.msg||'发布失败');
+							$item.formValidate('resetSubmit'); 
+						}else{
+							$item.find('[name="content"]').val('');
+							pManager.prev(config.type==='art'?'detailart':'',{id:config.id});
+						}
+					});
+				});
+			})
+		}).on('bsFormValid', function (e, flags) {
+			if(flags.content) $submit.addClass('able');
+			else $submit.removeClass('able');
+		}) 
+	}, 
+	
+	
+}
+
+module.exports = storeComponent;  
+},{"store/commentStore":18,"tool/format":22,"zepto":35}],5:[function(require,module,exports){
 var $ = require('zepto');
 var menus = require('plugin/menus')
 var messageStore = require('store/messageStore');
@@ -1168,7 +1228,7 @@ var storeComponent = {
 }
 
 module.exports = storeComponent;  
-},{"plugin/feeds":8,"plugin/menus":12,"plugin/paging":13,"store/messageStore":17,"zepto":32}],5:[function(require,module,exports){
+},{"plugin/feeds":9,"plugin/menus":13,"plugin/paging":14,"store/messageStore":19,"zepto":35}],6:[function(require,module,exports){
 var $ = require('zepto');
 var $ = require('zepto');
 var userStore = require('store/userStore');
@@ -1246,7 +1306,7 @@ var storeComponent = {
 }
 
 module.exports = storeComponent; 
-},{"store/userStore":18,"tool/ajax":19,"zepto":32}],6:[function(require,module,exports){
+},{"store/userStore":20,"tool/ajax":21,"zepto":35}],7:[function(require,module,exports){
 var $ = require('zepto'); 
 var pageContainer = require('view/viewContainer');
 
@@ -1850,7 +1910,7 @@ module.exports = moduleManager;
 
 
 
-},{"plugin/menus":12,"view/viewContainer":31,"zepto":32}],7:[function(require,module,exports){
+},{"plugin/menus":13,"view/viewContainer":34,"zepto":35}],8:[function(require,module,exports){
 var $ = require('zepto');
 var Swiper = require('plugin/swiper');
 
@@ -1912,7 +1972,7 @@ var baguetteBox = function () {
 }
 
 module.exports = baguetteBox;
-},{"plugin/swiper":15,"zepto":32}],8:[function(require,module,exports){
+},{"plugin/swiper":16,"zepto":35}],9:[function(require,module,exports){
 var $ = require('zepto');
 var messageStore = require('store/messageStore');
 var format = require('tool/format');
@@ -1992,9 +2052,9 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 			id = item.id,
 			name = nickName?(nickName+'('+ userName +')'): userName,
 			time = format(new Date(+item.createTime), 'yyyy-MM-dd hh:mm'),
-			imgHtml = this.buildImgs(item.images && JSON.parse(item.images));
+			imgHtml = this.buildImgs(item.images && JSON.parse(item.images)),
+			comCount = item.comCount;
 			
-		
 		html.push('<div class="feed-item" data-toggle="'+ (title?'toArticle':'toMessage') +'" data-id='+id+'>');
 		html.push('<div class="feed-head fix">');
 		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
@@ -2002,6 +2062,7 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 		html.push(imgHtml);
 		title&& html.push('<div class="feed-art"><div class="feed-title">'+ title +'</div><aside>'+ contentDesc +'</aside></div>');
 		content && html.push('<div class="fees-desc">'+ content +'</div>');
+		typeof comCount === 'number' && html.push('<div class="feed-bar"><div class="feed-bar-item">回复（'+ comCount +'）</div></div>');
 		html.push('</div>');
 			 
 	}
@@ -2041,7 +2102,7 @@ module.exports = function ($item, option) {
 		if (typeof option == 'string') data[option]();
 	});
 };  
-},{"plugin/baguetteBox":7,"plugin/paging":13,"store/messageStore":17,"tool/format":20,"zepto":32}],9:[function(require,module,exports){
+},{"plugin/baguetteBox":8,"plugin/paging":14,"store/messageStore":19,"tool/format":22,"zepto":35}],10:[function(require,module,exports){
 var $ = require('zepto');
 
 
@@ -2190,7 +2251,7 @@ var $ = require('zepto');
 	}
 	
 module.exports = null;
-},{"zepto":32}],10:[function(require,module,exports){
+},{"zepto":35}],11:[function(require,module,exports){
 
 
 /*!
@@ -2308,7 +2369,7 @@ module.exports = null;
 
 }));
 
-},{"zepto":32}],11:[function(require,module,exports){
+},{"zepto":35}],12:[function(require,module,exports){
 var flag = !!window.localStorage;
 
 module.exports = {
@@ -2322,7 +2383,7 @@ module.exports = {
 		flag && localStorage.removeItem(key);
 	}
 }; 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var $ = require('zepto');
 
 var $body = $('body');
@@ -2415,7 +2476,7 @@ var menusManager = {
  
 
 module.exports = menusManager;
-},{"zepto":32}],13:[function(require,module,exports){
+},{"zepto":35}],14:[function(require,module,exports){
 var $ = require('zepto');
 
 
@@ -2460,7 +2521,7 @@ var paging = {
 } 
 
 module.exports = paging; 
-},{"zepto":32}],14:[function(require,module,exports){
+},{"zepto":35}],15:[function(require,module,exports){
   var $ = require('zepto');
   var scrollLoad = (function (options) { 
         var defaults = (arguments.length == 0) ? { src: 'xsrc', time: 800} : { src: options.src || 'xsrc', time: options.time ||800};
@@ -2517,7 +2578,7 @@ module.exports = paging;
     });
   
  module.exports = scrollLoad;
-},{"zepto":32}],15:[function(require,module,exports){
+},{"zepto":35}],16:[function(require,module,exports){
 /**
  * Swiper 3.2.7
  * Most modern mobile touch slider and framework with hardware accelerated transitions
@@ -6741,7 +6802,7 @@ else if (typeof define === 'function' && define.amd) {
         return window.Swiper;
     });
 }
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -6773,7 +6834,26 @@ var storeManager = {
 } 
 
 module.exports = storeManager; 
-},{"tool/ajax":19,"zepto":32}],17:[function(require,module,exports){
+},{"tool/ajax":21,"zepto":35}],18:[function(require,module,exports){
+var $ = require('zepto');
+var ajax = require('tool/ajax');
+
+var storeManager = {
+	
+	addCom: function (data,callback) {
+		// body...
+		ajax({
+			url:'/comment/add',
+			callback:callback,
+			data:data
+		});
+	},
+	
+	
+} 
+
+module.exports = storeManager; 
+},{"tool/ajax":21,"zepto":35}],19:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -6798,7 +6878,7 @@ var storeManager = {
 } 
 
 module.exports = storeManager; 
-},{"tool/ajax":19,"zepto":32}],18:[function(require,module,exports){
+},{"tool/ajax":21,"zepto":35}],20:[function(require,module,exports){
 var $ = require('zepto');
 var ajax = require('tool/ajax');
 
@@ -6843,7 +6923,7 @@ var storeManager = {
 } 
 
 module.exports = storeManager;
-},{"tool/ajax":19,"zepto":32}],19:[function(require,module,exports){
+},{"tool/ajax":21,"zepto":35}],21:[function(require,module,exports){
 var $ = require('zepto');
 
 module.exports = function (config) {
@@ -6861,7 +6941,7 @@ module.exports = function (config) {
 		}
 	});
 }  
-},{"zepto":32}],20:[function(require,module,exports){
+},{"zepto":35}],22:[function(require,module,exports){
 module.exports = function (date,fmt) { //author: meizz 
     var o = {
         "M+": date.getMonth() + 1, //月份 
@@ -6877,14 +6957,14 @@ module.exports = function (date,fmt) { //author: meizz
     if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
 }
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 
 module.exports = function (url,key) {
 	var reg = new RegExp('(\\?|\\&)'+ key +'=([^\\&]+)')
 	var value = url.match(reg); 
 	return value&&value.length? value[2] : null;
 }
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var $ = require('zepto');
 var articleComponent = require('component/articleComponent');
 
@@ -6913,13 +6993,13 @@ var showEvent;
  
 var buildPage = function($view, callback, config) {
 	var pageManager = this; 
-		$view.find('.back-icon').on('click',function (){
-			if(config){
-				pageManager.prev('detailart', config);
-			}else{
-				pageManager.prev('article');
-			}
-		})
+	$view.find('.back-icon').on('click',function (){
+		if(config){
+			pageManager.prev('detailart', config);
+		}else{
+			pageManager.prev('article');
+		}
+	})
 
 	articleComponent.buildAddForm($view.find('#addArtForm'), pageManager, config);
 	callback && callback();
@@ -6932,7 +7012,54 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/articleComponent":3,"zepto":32}],23:[function(require,module,exports){
+},{"component/articleComponent":3,"zepto":35}],25:[function(require,module,exports){
+var $ = require('zepto');
+var commentComponent = require('component/commentComponent');
+
+var tpl = 
+	'<header class="addcom-head" id="addcom-head"><div class="left-icon back-icon"></div></header>'
+		+'<section class="addcom-area" id="addcom-area">'
+			+'<div class="container no-padding">'
+				+'<div id="addComForm" class="msg-form" role="form">'
+					+'<div class="form-group">'
+						+'<div class="form-control"><textarea name="content" placeholder="回复点什么···" data-required=true data-validate="msg"></textarea></div>'
+					+'</div>'
+					+'<div class="form-group dn">'
+						+'<input name="parentId" type="hidden">'
+					+'</div>'
+					+'<div class="form-group dn">'
+						+'<input name="type" type="hidden">'
+					+'</div>'
+					+'<div class="form-group dn">'
+						+'<input name="reId" type="hidden">'
+					+'</div>'
+					+'<div class="msg-btn" data-toggle="submit">回复</div>'
+				+'<div>'
+			+'</div>' 
+		+'</section>'
+		
+var hiddenEvent;
+
+var showEvent;
+
+var buildPage = function($view, callback, config) {
+	var pageManager = this; 
+	$view.find('.back-icon').on('click',function (){
+		pageManager.prev('detailart', config);
+		
+	})
+	commentComponent.buildAddForm($view.find('#addComForm'), pageManager, config);
+	callback && callback();
+} 
+
+module.exports = {
+	tpl: tpl,
+	hiddenEvent: hiddenEvent,
+	showEvent: showEvent, 
+	buildPage: buildPage,
+	needReload: true,
+} 
+},{"component/commentComponent":4,"zepto":35}],26:[function(require,module,exports){
 var $ = require('zepto');
 var messageComponent = require('component/messageComponent');
 
@@ -6970,7 +7097,7 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/messageComponent":4,"zepto":32}],24:[function(require,module,exports){
+},{"component/messageComponent":5,"zepto":35}],27:[function(require,module,exports){
 var $ = require('zepto');
 var articleComponent = require('component/articleComponent');
 
@@ -7006,7 +7133,7 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/articleComponent":3,"zepto":32}],25:[function(require,module,exports){
+},{"component/articleComponent":3,"zepto":35}],28:[function(require,module,exports){
 var $ = require('zepto');
 var articleComponent = require('component/articleComponent');
 
@@ -7019,6 +7146,7 @@ var tpl =
 					+'<div class="article-content" data-target="content"></div>'
 					+'<div class="article-bar fix"></div>'
 				+'</div>'
+				
 			+'</div>' 
 		+'</section>'
 		
@@ -7039,7 +7167,7 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/articleComponent":3,"zepto":32}],26:[function(require,module,exports){
+},{"component/articleComponent":3,"zepto":35}],29:[function(require,module,exports){
 var $ = require('zepto');
 
 var tpl = 
@@ -7096,7 +7224,7 @@ module.exports = {
 	hideMenu: 'auto',
 	errorList: errorList
 } 	
-},{"zepto":32}],27:[function(require,module,exports){
+},{"zepto":35}],30:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -7139,7 +7267,7 @@ module.exports = {
 	buildPage: buildPage
 }
  
-},{"component/userComponent":5,"zepto":32}],28:[function(require,module,exports){
+},{"component/userComponent":6,"zepto":35}],31:[function(require,module,exports){
 var $ = require('zepto');
 var messageComponent = require('component/messageComponent');
 
@@ -7178,7 +7306,7 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/messageComponent":4,"zepto":32}],29:[function(require,module,exports){
+},{"component/messageComponent":5,"zepto":35}],32:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -7214,7 +7342,7 @@ module.exports = {
 	needReload: true
 } 
  
-},{"component/userComponent":5,"zepto":32}],30:[function(require,module,exports){
+},{"component/userComponent":6,"zepto":35}],33:[function(require,module,exports){
 var $ = require('zepto');
 
 var userComponent = require('component/userComponent');
@@ -7259,7 +7387,7 @@ module.exports = {
 	needReload: true
 } 
  
-},{"component/userComponent":5,"zepto":32}],31:[function(require,module,exports){
+},{"component/userComponent":6,"zepto":35}],34:[function(require,module,exports){
 var pages = {};
 
 pages.regstu = require('./regStuView');
@@ -7278,12 +7406,14 @@ pages.article = require('./articleView');
 pages.addart = require('./addArtView');
 pages.detailart = require('./detailArtView')
 
+pages.addcom = require('./addComView');
+
 module.exports = {
 	get: function (page) { 
 		return pages[page]|| null;
 	}
 } 
-},{"./addArtView":22,"./addMsgView":23,"./articleView":24,"./detailArtView":25,"./errorView":26,"./mainView":27,"./messageView":28,"./regStuView":29,"./regUserView":30}],32:[function(require,module,exports){
+},{"./addArtView":24,"./addComView":25,"./addMsgView":26,"./articleView":27,"./detailArtView":28,"./errorView":29,"./mainView":30,"./messageView":31,"./regStuView":32,"./regUserView":33}],35:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/

@@ -77,9 +77,9 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 			id = item.id,
 			name = nickName?(nickName+'('+ userName +')'): userName,
 			time = format(new Date(+item.createTime), 'yyyy-MM-dd hh:mm'),
-			imgHtml = this.buildImgs(item.images && JSON.parse(item.images));
+			imgHtml = this.buildImgs(item.images && JSON.parse(item.images)),
+			comCount = item.comCount;
 			
-		
 		html.push('<div class="feed-item" data-toggle="'+ (title?'toArticle':'toMessage') +'" data-id='+id+'>');
 		html.push('<div class="feed-head fix">');
 		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
@@ -87,6 +87,7 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 		html.push(imgHtml);
 		title&& html.push('<div class="feed-art"><div class="feed-title">'+ title +'</div><aside>'+ contentDesc +'</aside></div>');
 		content && html.push('<div class="fees-desc">'+ content +'</div>');
+		typeof comCount === 'number' && html.push('<div class="feed-bar"><div class="feed-bar-item">回复（'+ comCount +'）</div></div>');
 		html.push('</div>');
 			 
 	}

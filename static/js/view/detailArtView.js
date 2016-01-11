@@ -10,6 +10,7 @@ var tpl =
 					+'<div class="article-content" data-target="content"></div>'
 					+'<div class="article-bar fix"></div>'
 				+'</div>'
+				
 			+'</div>' 
 		+'</section>'
 		
