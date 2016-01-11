@@ -4,8 +4,16 @@ var $ = require('zepto');
 
 var paging = {
 	buildScroll: function (module, $item, callback) {	
-		
-		callback();
+		$item.data('isLoading', true);
+		callback(null, function (flag){
+			if(flag){
+				$item.data('isLoading', false).trigger('loadedPaging');
+			}else{
+				$item.trigger('endPaging');
+				paging.clearScroll(module);
+			}
+		});
+		$item.data('isLoading', true);
 		$(window).on('scroll.'+module, function () { 
 			if($item.data('isLoading')) return;
 			if(Math.abs($(window).scrollTop() - $(document).height() + $(window).height()) < 200){

@@ -112,31 +112,39 @@ var service = {
 		http.get(weixinConfig.MEDIAHOST + url , function(res) {
 		    var size = 0;
 		    var chunks = [];
-		    var fileName = res.headers['content-disposition'].match(/filename="(.+)"/)[1];
-		  res.on('data', function(chunk){
-		      size += chunk.length;
-		      chunks.push(chunk);
-		  });
-		  res.on('end', function(){
-		        var data = Buffer.concat(chunks, size);
-		        var dimensions = sizeOf(data);
-		        var pathName = '/media/'+fileName;
-		        fs.writeFile('public'+pathName, data, function (err) {
-				    if (err) {
-				    	console.log('Error '+ err.message);
-				    	callback && callback(false);
-				    }else{
-				    	callback && callback({
-				    		path: pathName,
-				    		width: dimensions.width,
-				    		height: dimensions.height
-				    	});
-				    	console.log('File '+ fileName +' Saved !'); //文件被保存
-				    }
-				    
-			    }) ;
-		        
-		  });
+		    var fileName = res.headers['content-disposition'];
+		    if(!fileName){
+				console.log(JSON.stringify(res.headers));
+				callback && callback(false);
+		    }else{
+		    	fileName = fileName.match(/filename="(.+)"/)[1];
+				  res.on('data', function(chunk){
+				      size += chunk.length;
+				      chunks.push(chunk);
+				  });
+				  res.on('end', function(){
+				        var data = Buffer.concat(chunks, size);
+				        var dimensions = sizeOf(data);
+				        var pathName = '/media/'+fileName;
+				        fs.writeFile('public'+pathName, data, function (err) {
+						    if (err) {
+						    	console.log('Error '+ err.message);
+						    	callback && callback(false);
+						    }else{
+						    	callback && callback({
+						    		path: pathName,
+						    		width: dimensions.width,
+						    		height: dimensions.height
+						    	});
+						    	console.log('File '+ fileName +' Saved !'); //文件被保存
+						    }
+						    
+					    }) ;
+				        
+				  });
+		    }
+
+		  	
 		}).on('error', function(e) {
 			callback && callback(false);
 		    console.log("Got error: " + e.message);
