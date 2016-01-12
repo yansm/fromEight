@@ -23,7 +23,7 @@ module.exports = {
 			var sql = 'INSERT INTO c8_user(open_id, user_name, nick_name, stu_number, user_head, create_time) VALUES(?,?,?,?,?,?)'
 				,data = [bean.openId, bean.userName, bean.nickName, bean.stuNum, bean.userHead, bean.createTime];
 	  		connection.query(sql, data, function(err, result) {
-	        	if(!result) res = objectAssign({}, errcodeConfig[1001]);
+	        	if(err || !result) res = objectAssign({}, errcodeConfig[1001]);
 	        	callback&& callback(objectAssign({},res,{data:bean})); 
 		        // 释放连接 
 		        connection.release();
@@ -42,7 +42,7 @@ module.exports = {
 		pool.getConnection(function(err, connection) {
 			var sql = 'select nick_name as nickName,user_head as userHead, user_name as userName,stu_number as stuNum from c8_user where open_id=?';
 	  		connection.query(sql, bean.openId, function(err, result) {
-	        	if(!result || !result.length) res = objectAssign(res,{data: null});
+	        	if(err || !result || !result.length) res = objectAssign(res,{data: null});
 	        	else res = objectAssign(res,{data:result});
 	        	callback&& callback(res); 
 		        // 释放连接 
@@ -62,7 +62,7 @@ module.exports = {
 		pool.getConnection(function(err, connection) {
 			var sql = 'select * from c8_user where stu_number=?';
 	  		connection.query(sql, bean.stuNum, function(err, result) {
-	        	if(!result || !result.length) res = objectAssign(res,{data: null});
+	        	if(err || !result || !result.length) res = objectAssign(res,{data: null});
 	        	else res = objectAssign(res,{data:result});
 	        	callback&& callback(res); 
 		        // 释放连接 
@@ -84,7 +84,7 @@ module.exports = {
 			var sql = 'select nick_name as nickName,user_head as userHead, user_name as userName,stu_number as stuNum'
 				+' from c8_user  order by create_time desc ' + (start&&end? (' limit '+ start +','+ end +' '): '');
 	  		connection.query(sql, function(err, result) {
-	        	if(!result || !result.length) res = objectAssign(res,{data: null});
+	        	if(err || !result || !result.length) res = objectAssign(res,{data: null});
 	        	else res = objectAssign(res,{data:result});
 	        	callback&& callback(res); 
 		        // 释放连接 

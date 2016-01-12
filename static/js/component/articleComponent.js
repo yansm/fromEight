@@ -72,7 +72,7 @@ var storeComponent = {
 				$item.find('[data-target="time"]').html(createTime);
 				$item.find('[data-target="author"]').html(name);
 				$item.find('[data-target="content"]').html(content);
-				$('<div class="article-btn" data-toggle="commentArticle" data-id="'+ id +'" data-type="art">回复</div>')
+				$('<div class="article-btn" data-toggle="commentArticle" data-id="'+ id +'" data-type="art">评论</div>')
 					.appendTo($item.find('.article-bar'));
 				if(canWrite){
 					(function (data) {

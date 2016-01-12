@@ -1005,6 +1005,7 @@ $(function () {
 			pageManager.next('addcom',data);
 
 		})
+		
 	scrollLoading();
 
 }); 
@@ -1083,7 +1084,7 @@ var storeComponent = {
 				$item.find('[data-target="time"]').html(createTime);
 				$item.find('[data-target="author"]').html(name);
 				$item.find('[data-target="content"]').html(content);
-				$('<div class="article-btn" data-toggle="commentArticle" data-id="'+ id +'" data-type="art">回复</div>')
+				$('<div class="article-btn" data-toggle="commentArticle" data-id="'+ id +'" data-type="art">评论</div>')
 					.appendTo($item.find('.article-bar'));
 				if(canWrite){
 					(function (data) {
@@ -1108,7 +1109,8 @@ module.exports = storeComponent;
 var $ = require('zepto');
 
 var commentStore = require('store/commentStore');
-
+var feeds = require('plugin/feeds');
+var paging = require('plugin/paging');
 
 var format = require('tool/format');
 
@@ -1151,12 +1153,20 @@ var storeComponent = {
 			else $submit.removeClass('able');
 		}) 
 	}, 
-	
+	buildComList: function ($item, pManager, id){
+		feeds($item,{listFn: commentStore.listCom, extVars: {
+			parentId: id,
+			type: 'art'
+		}});
+	},
+	removeComList: function ($item, pManager){ 
+		feeds($item,'removeScroll');
+	},
 	
 }
 
 module.exports = storeComponent;  
-},{"store/commentStore":18,"tool/format":22,"zepto":35}],5:[function(require,module,exports){
+},{"plugin/feeds":9,"plugin/paging":14,"store/commentStore":18,"tool/format":22,"zepto":35}],5:[function(require,module,exports){
 var $ = require('zepto');
 var menus = require('plugin/menus')
 var messageStore = require('store/messageStore');
@@ -2016,7 +2026,11 @@ BuildFeeds.prototype.list = function () {
 	var me = this, $item = me.ele;
 	var listFn = this.options.listFn || messageStore.listMsg;
 	paging.buildScroll('cashlist', $item, function (page, doneFn) {
-		listFn({limit:5, stamp: page},function (e){
+		var data = {limit:5, stamp: page};
+		if(typeof me.options.extVars === 'object'){
+			data = $.extend(data, me.options.extVars);
+		}
+		listFn(data,function (e){
 				var data = e.data;
 					
 				var stamp = data.length?data[data.length-1].createTime : -1,
@@ -2041,6 +2055,7 @@ BuildFeeds.prototype.list = function () {
 
 BuildFeeds.prototype.buildList = function (data, stamp) { 
 	var html = [];
+	var extVars = this.options.extVars||{};
 	for(var i = 0,length = data.length; i < length; i ++) {
 		var item = data[i], 
 			content = item.content || '',
@@ -2049,20 +2064,23 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 			userHead = item.userHead,
 			userName = item.userName, 
 			nickName = item.nickName,
+			author = item.author,
 			id = item.id,
 			name = nickName?(nickName+'('+ userName +')'): userName,
 			time = format(new Date(+item.createTime), 'yyyy-MM-dd hh:mm'),
 			imgHtml = this.buildImgs(item.images && JSON.parse(item.images)),
-			comCount = item.comCount;
-			
+			comCount = item.comCount,
+			canRe = item.canRe,
+			reNickName = item.reNickName;
 		html.push('<div class="feed-item" data-toggle="'+ (title?'toArticle':'toMessage') +'" data-id='+id+'>');
 		html.push('<div class="feed-head fix">');
 		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
 		html.push('</div>');
 		html.push(imgHtml);
 		title&& html.push('<div class="feed-art"><div class="feed-title">'+ title +'</div><aside>'+ contentDesc +'</aside></div>');
-		content && html.push('<div class="fees-desc">'+ content +'</div>');
+		content && html.push('<div class="fees-desc">'+ (reNickName?'回复'+reNickName+'：':'') +content +'</div>');
 		typeof comCount === 'number' && html.push('<div class="feed-bar"><div class="feed-bar-item">回复（'+ comCount +'）</div></div>');
+		typeof canRe === 'number' && !canRe && html.push('<div class="fix"><div class="article-btn" data-toggle="commentArticle" data-type="'+extVars.type+'" data-id='+extVars.parentId+' data-reid="'+author+'" data-type="art">回复</div></div>');
 		html.push('</div>');
 			 
 	}
@@ -6848,7 +6866,13 @@ var storeManager = {
 			data:data
 		});
 	},
-	
+	listCom: function (data, callback) {
+		ajax({
+			url:'/comment/list',
+			callback:callback,
+			data:data
+		});
+	},
 	
 } 
 
@@ -7136,6 +7160,7 @@ module.exports = {
 },{"component/articleComponent":3,"zepto":35}],28:[function(require,module,exports){
 var $ = require('zepto');
 var articleComponent = require('component/articleComponent');
+var commentComponent = require('component/commentComponent');
 
 var tpl = 
 	'<header class="detailart-head" id="detailart-head"><div class="left-icon back-icon" data-toggle="prev" data-target="article"></div></header>'
@@ -7146,17 +7171,25 @@ var tpl =
 					+'<div class="article-content" data-target="content"></div>'
 					+'<div class="article-bar fix"></div>'
 				+'</div>'
-				
+				+'<div class="comment-list"  data-toggle="feeds" data-type="list"><div class="feeds-list"></div><div class="toolbar">'
+					+'<div class="toolbar-loaded"></div>'
+					+'<div class="toolbar-loading">更新中···</div>'
+					+'<div class="toolbar-end">到底了</div>'
+				+'</div></div>'
 			+'</div>' 
 		+'</section>'
 		
-var hiddenEvent;
+var hiddenEvent = function (view){
+	var pageManager = this;
+	commentComponent.removeComList(view.content.find('.comment-list'), pageManager);
+};
 
 var showEvent;
  
 var buildPage = function($view, callback, config) {
 	var pageManager = this; 
 	articleComponent.buildArticle($view.find('.article-box'), pageManager, config.id);
+	commentComponent.buildComList($view.find('.comment-list'), pageManager, config.id);
 	callback && callback();
 } 
 
@@ -7167,7 +7200,7 @@ module.exports = {
 	buildPage: buildPage,
 	needReload: true,
 } 
-},{"component/articleComponent":3,"zepto":35}],29:[function(require,module,exports){
+},{"component/articleComponent":3,"component/commentComponent":4,"zepto":35}],29:[function(require,module,exports){
 var $ = require('zepto');
 
 var tpl = 

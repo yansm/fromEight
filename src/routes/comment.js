@@ -27,8 +27,20 @@ router.post('/add',function(req, res, next){
 		res.json(uRes);
 	});
 	
-	
-	
+});
+
+/**
+ * [description]
+ * @yansanmu github.com/yansm
+ * @DateTime 2016-01-12T19:15:50+0800
+ */
+router.post('/list',function(req, res, next){
+	var data = req.body;
+	var openId = req.cookies['open_id'];
+	data = objectAssign({}, data, {openId: openId});
+	commentService.list(data,function (uRes) {
+		res.json(uRes);
+	});
 });
 
 module.exports = router;

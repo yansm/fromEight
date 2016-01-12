@@ -1,7 +1,8 @@
 var $ = require('zepto');
 
 var commentStore = require('store/commentStore');
-
+var feeds = require('plugin/feeds');
+var paging = require('plugin/paging');
 
 var format = require('tool/format');
 
@@ -44,7 +45,15 @@ var storeComponent = {
 			else $submit.removeClass('able');
 		}) 
 	}, 
-	
+	buildComList: function ($item, pManager, id){
+		feeds($item,{listFn: commentStore.listCom, extVars: {
+			parentId: id,
+			type: 'art'
+		}});
+	},
+	removeComList: function ($item, pManager){ 
+		feeds($item,'removeScroll');
+	},
 	
 }
 

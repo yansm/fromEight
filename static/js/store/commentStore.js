@@ -11,7 +11,13 @@ var storeManager = {
 			data:data
 		});
 	},
-	
+	listCom: function (data, callback) {
+		ajax({
+			url:'/comment/list',
+			callback:callback,
+			data:data
+		});
+	},
 	
 } 
 

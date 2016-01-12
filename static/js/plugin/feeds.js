@@ -41,7 +41,11 @@ BuildFeeds.prototype.list = function () {
 	var me = this, $item = me.ele;
 	var listFn = this.options.listFn || messageStore.listMsg;
 	paging.buildScroll('cashlist', $item, function (page, doneFn) {
-		listFn({limit:5, stamp: page},function (e){
+		var data = {limit:5, stamp: page};
+		if(typeof me.options.extVars === 'object'){
+			data = $.extend(data, me.options.extVars);
+		}
+		listFn(data,function (e){
 				var data = e.data;
 					
 				var stamp = data.length?data[data.length-1].createTime : -1,
@@ -66,6 +70,7 @@ BuildFeeds.prototype.list = function () {
 
 BuildFeeds.prototype.buildList = function (data, stamp) { 
 	var html = [];
+	var extVars = this.options.extVars||{};
 	for(var i = 0,length = data.length; i < length; i ++) {
 		var item = data[i], 
 			content = item.content || '',
@@ -74,20 +79,23 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 			userHead = item.userHead,
 			userName = item.userName, 
 			nickName = item.nickName,
+			author = item.author,
 			id = item.id,
 			name = nickName?(nickName+'('+ userName +')'): userName,
 			time = format(new Date(+item.createTime), 'yyyy-MM-dd hh:mm'),
 			imgHtml = this.buildImgs(item.images && JSON.parse(item.images)),
-			comCount = item.comCount;
-			
+			comCount = item.comCount,
+			canRe = item.canRe,
+			reNickName = item.reNickName;
 		html.push('<div class="feed-item" data-toggle="'+ (title?'toArticle':'toMessage') +'" data-id='+id+'>');
 		html.push('<div class="feed-head fix">');
 		html.push('<img src="'+userHead+'" /><div class="l"><div class="feed-name">'+ name +'</div><div class="feed-time">'+time+'</div></div>');
 		html.push('</div>');
 		html.push(imgHtml);
 		title&& html.push('<div class="feed-art"><div class="feed-title">'+ title +'</div><aside>'+ contentDesc +'</aside></div>');
-		content && html.push('<div class="fees-desc">'+ content +'</div>');
+		content && html.push('<div class="fees-desc">'+ (reNickName?'回复'+reNickName+'：':'') +content +'</div>');
 		typeof comCount === 'number' && html.push('<div class="feed-bar"><div class="feed-bar-item">回复（'+ comCount +'）</div></div>');
+		typeof canRe === 'number' && !canRe && html.push('<div class="fix"><div class="article-btn" data-toggle="commentArticle" data-type="'+extVars.type+'" data-id='+extVars.parentId+' data-reid="'+author+'" data-type="art">回复</div></div>');
 		html.push('</div>');
 			 
 	}

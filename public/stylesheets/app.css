@@ -2114,6 +2114,16 @@ button.swiper-pagination-bullet {
   margin-top: 0;
   padding: 0;
 }
+.comment-list .fix {
+  border-bottom: 2px solid #d5d5d5;
+}
+.comment-list .feed-item {
+  padding-bottom: 0;
+  border: 0;
+}
+.detailart-area .container {
+  background-color: #fff;
+}
 /**
  * 动画效果
  */

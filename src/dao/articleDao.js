@@ -23,7 +23,7 @@ module.exports = {
 			var sql = 'INSERT INTO c8_article(title, content, author, create_time, update_time, status) VALUES(?,?,?,?,?,?)'
 				,data = [bean.title, bean.content, ''+bean.author, bean.createTime, bean.createTime, bean.status];
 	  		connection.query(sql, data, function(err, result) {
-	        	if(!result) res = objectAssign({}, errcodeConfig[1001]); 
+	        	if(err || !result) res = objectAssign({}, errcodeConfig[1001]); 
 	        	bean.canWrite = 1;
 	        	bean.id = result.insertId;
 	        	callback&& callback(objectAssign({},res,{data:bean})); 
@@ -46,7 +46,7 @@ module.exports = {
 			var sql = 'UPDATE c8_article SET ? WHERE id=?'
 				,data = {title: bean.title, content: bean.content, update_time: bean.updateTime};
 	  		connection.query(sql, [data, +bean.id], function(err, result) {
-	        	if(!result) res = objectAssign({}, errcodeConfig[1001]); 
+	        	if(err || !result) res = objectAssign({}, errcodeConfig[1001]); 
 	        	bean.canWrite = 1;
 	        	callback&& callback(objectAssign({},res,{data:bean})); 
 		        // 释放连接 
@@ -71,7 +71,7 @@ module.exports = {
 				+' from c8_user u,c8_article m  left join c8_comment c on m.id = c.parent_id and c.type="art" where u.open_id = m.author and m.status = 1 and  m.create_time < ? GROUP BY m.id order by m.create_time desc limit 0,? ';
 	  		connection.query(sql,[''+bean.openId, ''+stamp, +limit], function(err, result) {
 	  			if(err) console.log('error: '+err);
-	        	if(!result || !result.length) res = objectAssign(res,{data: []});
+	        	if(err || !result || !result.length) res = objectAssign(res,{data: []});
 	        	else {
 	        		if(!result[0].id) res = objectAssign(res,{data: []});
 	        		else res = objectAssign(res,{data:result});
@@ -99,7 +99,7 @@ module.exports = {
 				+' from c8_user u,c8_article m where u.open_id = m.author and m.status = 1 and m.id=? ';
 	  		connection.query(sql,[''+bean.openId, +bean.id], function(err, result) {
 	  			if(err) console.log('error: '+err);
-	        	if(!result || !result.length) res = objectAssign(res,{data: []});
+	        	if(err || !result || !result.length) res = objectAssign(res,{data: []});
 	        	else res = objectAssign(res,{data:result});
 	        	callback&& callback(res); 
 		        // 释放连接 

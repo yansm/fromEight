@@ -161,6 +161,7 @@ $(function () {
 			pageManager.next('addcom',data);
 
 		})
+		
 	scrollLoading();
 
 }); 
