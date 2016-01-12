@@ -95,7 +95,7 @@ BuildFeeds.prototype.buildList = function (data, stamp) {
 		title&& html.push('<div class="feed-art"><div class="feed-title">'+ title +'</div><aside>'+ contentDesc +'</aside></div>');
 		content && html.push('<div class="fees-desc">'+ (reNickName?'回复'+reNickName+'：':'') +content +'</div>');
 		typeof comCount === 'number' && html.push('<div class="feed-bar"><div class="feed-bar-item">回复（'+ comCount +'）</div></div>');
-		typeof canRe === 'number' && !canRe && html.push('<div class="fix"><div class="article-btn" data-toggle="commentArticle" data-type="'+extVars.type+'" data-id='+extVars.parentId+' data-reid="'+author+'" data-type="art">回复</div></div>');
+		typeof canRe === 'number' && !canRe && html.push('<div class="fix feed-com"><div class="article-btn" data-toggle="commentArticle" data-type="'+extVars.type+'" data-id='+extVars.parentId+' data-reid="'+author+'" data-type="art">回复</div></div>');
 		html.push('</div>');
 			 
 	}
