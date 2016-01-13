@@ -1648,6 +1648,7 @@ button.swiper-pagination-bullet {
   padding: 14px 30px;
   font-size: .9em;
   float: left;
+  height: 190px;
 }
 .main-useritem img {
   width: 100%;

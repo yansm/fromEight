@@ -89,7 +89,7 @@ module.exports = {
 	},20093523: {
 		userName:'郑小晶',
 		nickName:'小晶',
-	},99999999: {
+	},88888888: {
 		userName:'测试',
 		nickName:'路人',
 	}
