@@ -1,6 +1,7 @@
 var http = require("http");
 var https = require("https");
 
+
 var objectAssign = require('object-assign');
 
 var defaultOptions = {
@@ -16,9 +17,9 @@ var defaultOptions = {
  * @param options: http options object
  * @param callback: callback to pass the results JSON object(s) back
  */
-module.exports = function(options, onResult)
+module.exports = function(options, onResult, data)
 {
-    var options = objectAssign(defaultOptions, options);
+    var options = objectAssign({}, defaultOptions, options);
     var prot = options.port == 443 ? https : http;
     var req = prot.request(options, function(res)
     {
@@ -35,6 +36,8 @@ module.exports = function(options, onResult)
             onResult(res.statusCode, obj);
         });
     });
+
+    if(data) req.write(data);
 
     req.on('error', function(err) {
         console.log('error: ' + err.message);

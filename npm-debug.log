@@ -1,0 +1,191 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'D:\\nodejs\\node.exe',
+1 verbose cli   'D:\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'qs',
+1 verbose cli   '--save' ]
+2 info using npm@3.3.12
+3 info using node@v5.3.0
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData qs
+8 silly fetchNamedPackageData qs
+9 silly mapToRegistry name qs
+10 silly mapToRegistry using default registry
+11 silly mapToRegistry registry https://registry.npmjs.org/
+12 silly mapToRegistry uri https://registry.npmjs.org/qs
+13 verbose request uri https://registry.npmjs.org/qs
+14 verbose request no auth needed
+15 info attempt registry request try #1 at 23:26:22
+16 verbose request id 4583aaa0d0995eba
+17 verbose etag "ABBTZ14CMW8TB0ZN25ZL5AVYM"
+18 http request GET https://registry.npmjs.org/qs
+19 info retry will retry, error on last attempt: Error: socket hang up
+20 info attempt registry request try #2 at 23:27:40
+21 verbose etag "ABBTZ14CMW8TB0ZN25ZL5AVYM"
+22 http request GET https://registry.npmjs.org/qs
+23 info retry will retry, error on last attempt: Error: read ECONNRESET
+24 info attempt registry request try #3 at 23:29:01
+25 verbose etag "ABBTZ14CMW8TB0ZN25ZL5AVYM"
+26 http request GET https://registry.npmjs.org/qs
+27 silly get cb [ 304, undefined ]
+28 verbose etag https://registry.npmjs.org/qs from cache
+29 verbose get saving qs to C:\Users\Administrator\AppData\Roaming\npm-cache\registry.npmjs.org\qs\.cache.json
+30 silly install normalizeTree
+31 silly loadCurrentTree Finishing
+32 silly loadIdealTree Starting
+33 silly install loadIdealTree
+34 silly cloneCurrentTree Starting
+35 silly install cloneCurrentTreeToIdealTree
+36 silly cloneCurrentTree Finishing
+37 silly loadShrinkwrap Starting
+38 silly install loadShrinkwrap
+39 silly loadShrinkwrap Finishing
+40 silly loadAllDepsIntoIdealTree Starting
+41 silly install loadAllDepsIntoIdealTree
+42 silly resolveWithNewModule qs@6.0.1 checking installable status
+43 silly cache add args [ 'qs', null ]
+44 verbose cache add spec qs
+45 silly cache add parsed spec Result {
+45 silly cache add   raw: 'qs',
+45 silly cache add   scope: null,
+45 silly cache add   name: 'qs',
+45 silly cache add   rawSpec: '',
+45 silly cache add   spec: '*',
+45 silly cache add   type: 'range' }
+46 silly addNamed qs@*
+47 verbose addNamed "*" is a valid semver range for qs
+48 silly addNameRange { name: 'qs', range: '*', hasData: false }
+49 silly mapToRegistry name qs
+50 silly mapToRegistry using default registry
+51 silly mapToRegistry registry https://registry.npmjs.org/
+52 silly mapToRegistry uri https://registry.npmjs.org/qs
+53 verbose addNameRange registry:https://registry.npmjs.org/qs not in flight; fetching
+54 verbose get https://registry.npmjs.org/qs not expired, no request
+55 silly addNameRange number 2 { name: 'qs', range: '*', hasData: true }
+56 silly addNameRange versions [ 'qs',
+56 silly addNameRange   [ '0.0.1',
+56 silly addNameRange     '0.0.2',
+56 silly addNameRange     '0.0.3',
+56 silly addNameRange     '0.0.4',
+56 silly addNameRange     '0.0.5',
+56 silly addNameRange     '0.0.6',
+56 silly addNameRange     '0.0.7',
+56 silly addNameRange     '0.1.0',
+56 silly addNameRange     '0.2.0',
+56 silly addNameRange     '0.3.0',
+56 silly addNameRange     '0.3.1',
+56 silly addNameRange     '0.3.2',
+56 silly addNameRange     '0.4.0',
+56 silly addNameRange     '0.4.1',
+56 silly addNameRange     '0.4.2',
+56 silly addNameRange     '0.5.0',
+56 silly addNameRange     '0.5.1',
+56 silly addNameRange     '0.5.2',
+56 silly addNameRange     '0.5.3',
+56 silly addNameRange     '0.5.4',
+56 silly addNameRange     '0.5.5',
+56 silly addNameRange     '0.5.6',
+56 silly addNameRange     '0.6.0',
+56 silly addNameRange     '0.6.1',
+56 silly addNameRange     '0.6.2',
+56 silly addNameRange     '0.6.3',
+56 silly addNameRange     '0.6.4',
+56 silly addNameRange     '0.6.5',
+56 silly addNameRange     '0.6.6',
+56 silly addNameRange     '1.0.0',
+56 silly addNameRange     '1.0.1',
+56 silly addNameRange     '1.0.2',
+56 silly addNameRange     '1.1.0',
+56 silly addNameRange     '1.2.0',
+56 silly addNameRange     '1.2.1',
+56 silly addNameRange     '1.2.2',
+56 silly addNameRange     '2.0.0',
+56 silly addNameRange     '2.1.0',
+56 silly addNameRange     '2.2.0',
+56 silly addNameRange     '2.2.1',
+56 silly addNameRange     '2.2.2',
+56 silly addNameRange     '2.2.3',
+56 silly addNameRange     '2.2.4',
+56 silly addNameRange     '2.2.5',
+56 silly addNameRange     '2.3.0',
+56 silly addNameRange     '2.3.1',
+56 silly addNameRange     '2.3.2',
+56 silly addNameRange     '2.3.3',
+56 silly addNameRange     '2.4.0',
+56 silly addNameRange     '2.4.1',
+56 silly addNameRange     '2.4.2',
+56 silly addNameRange     '3.0.0',
+56 silly addNameRange     '3.1.0',
+56 silly addNameRange     '4.0.0',
+56 silly addNameRange     '5.0.0',
+56 silly addNameRange     '5.1.0',
+56 silly addNameRange     '5.2.0',
+56 silly addNameRange     '6.0.0',
+56 silly addNameRange     '6.0.1' ] ]
+57 silly addNamed qs@6.0.1
+58 verbose addNamed "6.0.1" is a plain semver version for qs
+59 silly mapToRegistry name qs
+60 silly mapToRegistry using default registry
+61 silly mapToRegistry registry https://registry.npmjs.org/
+62 silly mapToRegistry uri https://registry.npmjs.org/qs
+63 verbose addRemoteTarball https://registry.npmjs.org/qs/-/qs-6.0.1.tgz not in flight; adding
+64 verbose addRemoteTarball [ 'https://registry.npmjs.org/qs/-/qs-6.0.1.tgz',
+64 verbose addRemoteTarball   'ee8b7fcd64fcbe6e36c922bd2c464ee7c54766c3' ]
+65 info retry fetch attempt 1 at 23:29:25
+66 info attempt registry request try #1 at 23:29:25
+67 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+68 info retry will retry, error on last attempt: Error: read ECONNRESET
+69 info attempt registry request try #2 at 23:29:57
+70 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+71 info retry will retry, error on last attempt: Error: read ECONNRESET
+72 info attempt registry request try #3 at 23:31:17
+73 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+74 error fetch failed https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+75 warn retry will retry, error on last attempt: Error: read ECONNRESET
+76 info retry fetch attempt 2 at 23:31:50
+77 info attempt registry request try #1 at 23:31:50
+78 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+79 info retry will retry, error on last attempt: Error: read ECONNRESET
+80 info attempt registry request try #2 at 23:33:04
+81 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+82 info retry will retry, error on last attempt: Error: read ECONNRESET
+83 info attempt registry request try #3 at 23:34:27
+84 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+85 error fetch failed https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+86 warn retry will retry, error on last attempt: Error: connect ETIMEDOUT 103.245.222.162:443
+87 info retry fetch attempt 3 at 23:35:48
+88 info attempt registry request try #1 at 23:35:48
+89 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+90 info retry will retry, error on last attempt: Error: connect ETIMEDOUT 103.245.222.162:443
+91 info attempt registry request try #2 at 23:36:20
+92 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+93 info retry will retry, error on last attempt: Error: socket hang up
+94 info attempt registry request try #3 at 23:38:25
+95 http fetch GET https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+96 error fetch failed https://registry.npmjs.org/qs/-/qs-6.0.1.tgz
+97 silly rollbackFailedOptional Starting
+98 silly rollbackFailedOptional Finishing
+99 silly runTopLevelLifecycles Starting
+100 silly runTopLevelLifecycles Finishing
+101 silly install printInstalled
+102 verbose stack Error: read ECONNRESET
+102 verbose stack     at exports._errnoException (util.js:855:11)
+102 verbose stack     at TLSWrap.onread (net.js:544:26)
+103 verbose cwd D:\cygwin\home\Administrator\express\fromEight
+104 error Windows_NT 6.1.7601
+105 error argv "D:\\nodejs\\node.exe" "D:\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "qs" "--save"
+106 error node v5.3.0
+107 error npm  v3.3.12
+108 error code ECONNRESET
+109 error errno ECONNRESET
+110 error syscall read
+111 error network read ECONNRESET
+111 error network This is most likely not a problem with npm itself
+111 error network and is related to network connectivity.
+111 error network In most cases you are behind a proxy or have bad network settings.
+111 error network
+111 error network If you are behind a proxy, please make sure that the
+111 error network 'proxy' config is set properly.  See: 'npm help config'
+112 verbose exit [ 1, true ]

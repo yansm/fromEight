@@ -7,6 +7,7 @@ var fs = require("fs");
 var sizeOf = require('image-size');
 
 var getJson = reqlib('src/plugins/getjson');
+var querystring = require('qs')
 
 var service = {
 	/**
@@ -97,6 +98,27 @@ var service = {
 			}
 		});
 	},
+	sendMessage : function (accessToken, callback, _data) {
+		var url = '/cgi-bin/message/custom/send?access_token='+ accessToken;
+		var data = JSON.stringify(_data);
+		console.log(data);
+		var options = {
+			host: weixinConfig.HOST,
+		    path: url,
+		    method: 'POST',
+		    headers: {   
+				"Content-Type":"application/json",
+				"Content-Length": data.length  
+			} 
+		}
+		getJson(options, function(status, res){
+			if(status===200){
+				callback && callback(res);
+			}else{
+				callback && callback(false)
+			}
+		}, data);
+	},	
 	/**
 	 * [getMedia 获取附件]
 	 * yansanmu 

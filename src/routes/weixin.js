@@ -15,6 +15,22 @@ router.get('/', function(req, res, next) {
 	if(req.cookies['open_id']){ 
 		console.log('有coookie') 
 		res.render('index', { title: '0908' });
+		weixinService.sendMessage(global.myConfig.accessToken, function () {
+			var i = arguments;
+			var t = i;
+		}, {
+		    touser:req.cookies['open_id'],
+		    msgtype:"news",
+		    news:{
+		        articles: [
+		         {
+		             title:"hehe",
+		             description:"enen",
+		             url:"URL",
+		         }
+		        ]
+		    }
+		});
 	}else{
 		var code = req.query.code;
 		weixinService.getTokenByCode(code,function(wRes){
